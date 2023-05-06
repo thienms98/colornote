@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 export const settingsSlice = createSlice({
   name: "settings",
   initialState: {
-    view: "Normal", // normal || side
+    view: "Side", // normal || side
   },
   reducers: {
     setView: (state, action) => {

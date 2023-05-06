@@ -20,7 +20,7 @@ Archived.defaultProps = {};
 function Archived({ data, handleDelNote, setArchivedData, toolsNote }) {
   const [value, setValue] = useState("");
   const [dataFilter, setDataFilter] = useState([]);
-  const [construct, setConstruct] = useState("Grid");
+  const [construct, setConstruct] = useState("List");
   const { view } = useSelector((state) => state.settings);
   useEffect(() => {
     if (value.trim() === "") {
@@ -36,6 +36,7 @@ function Archived({ data, handleDelNote, setArchivedData, toolsNote }) {
       });
       setDataFilter(newData || []);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
   useEffect(() => {
     setDataFilter(data);

@@ -29,7 +29,6 @@ function getList(list, type) {
 }
 
 export default function EditForm({ dataItem, handleDelNote, setArchivedData, clear }) {
-  console.log(dataItem);
   const [drawerEdit, setDrawerEdit] = useState(false);
   const [pinned, setPinned] = useState(dataItem.pinned);
   const [data, setData] = useState(getList(dataItem.data, dataItem.type));

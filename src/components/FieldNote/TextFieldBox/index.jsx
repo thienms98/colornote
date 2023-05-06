@@ -1,7 +1,8 @@
 import { Box, Button, TextField } from "@mui/material";
 import { useSnackbar } from "notistack";
+import useDebounce from "../../../customHook/useDebounce";
 import PropTypes from "prop-types";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { convertColor } from "../../../constants";
 
 TextFieldBox.propTypes = {
@@ -18,6 +19,7 @@ function TextFieldBox({ bg, handleNoteForm, isSubmitting, cx = "", tt = "", acti
   const [title, setTitle] = useState(tt);
   const [content, setContent] = useState(cx);
   const { enqueueSnackbar } = useSnackbar();
+
   const handleChangeContent = (e) => {
     const val = e.target.value;
     setContent(val);
@@ -26,16 +28,20 @@ function TextFieldBox({ bg, handleNoteForm, isSubmitting, cx = "", tt = "", acti
     const val = e.target.value;
     setTitle(val);
   };
+
+  const cxDebounce = useDebounce(content, 500) || cx;
+  const ttDebounce = useDebounce(title, 500) || tt;
+
   const handleSubmit = () => {
-    if (title.trim() === "" || content.trim() === "") {
+    if (ttDebounce.trim() === "" || cxDebounce.trim() === "") {
       enqueueSnackbar("Please fill in note!", { variant: "error" });
       return;
     }
     const note = {
-      title: title,
+      title: ttDebounce,
       color: bg,
       type: "text",
-      data: content,
+      data: cxDebounce,
     };
     if (action === "Create") {
       setTitle("");
@@ -43,6 +49,12 @@ function TextFieldBox({ bg, handleNoteForm, isSubmitting, cx = "", tt = "", acti
     }
     handleNoteForm(note);
   };
+
+  useEffect(() => {
+    if (action !== "Edit") return;
+    if (cxDebounce === cx && ttDebounce === tt) return;
+    handleSubmit();
+  }, [cxDebounce, ttDebounce, action]);
 
   return (
     <Box
@@ -91,7 +103,8 @@ function TextFieldBox({ bg, handleNoteForm, isSubmitting, cx = "", tt = "", acti
           spellCheck='off'
           sx={{
             paddingTop: "20px",
-            height: "80vh",
+            minHeight: "80vh",
+            overflowY: "scroll",
             "&>textarea": {
               height: "100%",
             },

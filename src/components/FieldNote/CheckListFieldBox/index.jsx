@@ -14,6 +14,7 @@ import React, { useEffect, useState } from "react";
 import { Add, Close } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
 import { convertColor } from "../../../constants";
+import useDebounce from "../../../customHook/useDebounce";
 
 CheckListBox.propTypes = {
   bg: PropTypes.object.isRequired,
@@ -35,8 +36,11 @@ function CheckListBox({ bg, handleNoteForm, action, tt = "", list = null }) {
     const val = e.target.value;
     setTitle(val);
   };
-  const handleSubmit = () => {
-    if (title?.trim() === "" || listCheckbox.find((item) => item.content === "")) {
+
+  const ttDebounce = useDebounce(title, 500) || tt;
+
+  const handleSubmit = (title) => {
+    if (ttDebounce?.trim() === "" || listCheckbox.find((item) => item.content === "")) {
       enqueueSnackbar("Please fill in note!", { variant: "error" });
       return;
     }
@@ -45,7 +49,7 @@ function CheckListBox({ bg, handleNoteForm, action, tt = "", list = null }) {
       return;
     }
     const note = {
-      title: title,
+      title: ttDebounce,
       color: bg,
       type: "text",
       data: listCheckbox.map((item) => ({ content: item.content, status: item.status })),
@@ -83,6 +87,12 @@ function CheckListBox({ bg, handleNoteForm, action, tt = "", list = null }) {
     const rs = newList.filter((item) => item.id !== id);
     setListCheckbox(rs);
   };
+
+  React.useEffect(() => {
+    if (action !== "Edit") return;
+    if (ttDebounce === tt) return;
+    handleSubmit();
+  }, [ttDebounce, action]);
   return (
     <Box
       sx={{
@@ -94,8 +104,7 @@ function CheckListBox({ bg, handleNoteForm, action, tt = "", list = null }) {
         marginTop: "10px",
 
         width: "100%",
-        minHeight: "200px",
-        height: "80vh",
+        minHeight: "80vh",
       }}
     >
       <Box className='note-title'>

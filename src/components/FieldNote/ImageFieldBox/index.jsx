@@ -2,6 +2,7 @@ import { Box, Button, TextField } from "@mui/material";
 import { useSnackbar } from "notistack";
 import PropTypes from "prop-types";
 import React, { useState } from "react";
+import useDebounce from "../../../customHook/useDebounce";
 import { convertColor } from "../../../constants";
 
 ImageFieldBox.propTypes = {
@@ -28,16 +29,19 @@ function ImageFieldBox({ bg, handleNoteForm, isSubmitting, cx = "", src = "", tt
     const val = e.target.value;
     setTitle(val);
   };
+
+  const cxDebounce = useDebounce(content, 500) || cx;
+  const ttDebounce = useDebounce(title, 500) || tt;
   const handleSubmit = () => {
-    if (title.trim() === "" || content.trim() === "") {
+    if (ttDebounce.trim() === "" || cxDebounce.trim() === "") {
       enqueueSnackbar("Please fill in note!", { variant: "error" });
       return;
     }
     const note = {
-      title: title,
+      title: ttDebounce,
       color: bg,
       type: "text",
-      data: content,
+      data: cxDebounce,
     };
     if (action === "Create") {
       setTitle("");
@@ -45,6 +49,13 @@ function ImageFieldBox({ bg, handleNoteForm, isSubmitting, cx = "", src = "", tt
     }
     handleNoteForm(note);
   };
+
+  React.useEffect(() => {
+    if (action !== "Edit") return;
+    if (content === cx && title === tt) return;
+    handleSubmit();
+  }, [cxDebounce, ttDebounce, action]);
+
   return (
     <Box
       sx={{
@@ -93,7 +104,7 @@ function ImageFieldBox({ bg, handleNoteForm, isSubmitting, cx = "", src = "", tt
           spellCheck='off'
           sx={{
             paddingTop: "20px",
-            height: "80vh",
+            minHeight: "80vh",
             "&>textarea": {
               height: "100%",
             },
