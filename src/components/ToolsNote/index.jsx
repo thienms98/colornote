@@ -1,4 +1,4 @@
-import { CalendarMonth, Lock, Repeat, Share, Visibility, VisibilityOff } from "@mui/icons-material";
+import { CalendarMonth, Lock, Public, Share, Visibility, VisibilityOff } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -51,6 +51,7 @@ function ToolsNote(props) {
   const [remindAt, setRemindAt] = useState(options.remindAt);
   const [openLock, setOpenLock] = useState(false);
   const [valueLock, setValueLock] = useState(options.lock);
+  const [notePublic, setNotePublic] = useState(true);
   const { enqueueSnackbar } = useSnackbar();
   const [showPassword, setShowPassword] = useState(false);
   useEffect(() => {
@@ -85,6 +86,10 @@ function ToolsNote(props) {
   };
   const handleClickRemind = () => {
     setPopRemind(true);
+  };
+  const handleNotePublic = () => {
+    setNotePublic((prev) => !prev);
+    handleOptionsNote({ notePublic: !notePublic });
   };
   const warningAlert = () => {
     enqueueSnackbar("Sharing is currently unavailable. Try it in the next update", {
@@ -396,6 +401,20 @@ function ToolsNote(props) {
               setDueAt(newValue);
             }}
           />
+        </ListItem>
+        <ListItem>
+          <ListItemButton
+            sx={{
+              borderRadius: "10px",
+              "& .Mui-selected": {
+                borderRadius: "10px",
+              },
+            }}
+            onClick={handleNotePublic}
+          >
+            <ListItemIcon>{notePublic ? <Public /> : <Lock />}</ListItemIcon>
+            <ListItemText primary={notePublic ? "Public" : "Private"} />
+          </ListItemButton>
         </ListItem>
       </List>
     </div>

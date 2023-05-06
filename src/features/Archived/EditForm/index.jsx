@@ -41,7 +41,9 @@ export default function EditForm({ dataItem, handleDelNote, setArchivedData, cle
     remindAt: typeof dataItem.remindAt !== "object" ? dayjs(dataItem.remindAt) : dataItem.remindAt,
     lock: dataItem.lock,
     share: dataItem.share,
+    notePublic: dataItem.notePublic || 1,
   });
+  console.log(options);
 
   const handleChangeNote = (color) => {
     setColorNote(color);

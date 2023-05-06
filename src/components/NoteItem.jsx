@@ -58,7 +58,9 @@ function NoteItem({ dataItem, handleDelNote, setArchivedData, construct, full = 
     remindAt: typeof dataItem.remindAt !== "object" ? dayjs(dataItem.remindAt) : dataItem.remindAt,
     lock: dataItem.lock,
     share: dataItem.share,
+    notePublic: dataItem.notePublic || true,
   });
+
   const handleChange = async (id) => {
     try {
       await noteApi.tick(id);

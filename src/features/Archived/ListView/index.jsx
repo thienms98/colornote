@@ -8,6 +8,7 @@ function ListView({ construct = "Grid", data, setArchivedData, handleDelNote, to
   const [selected, setSelected] = useState(0);
   const clear = () => setSelected(null);
 
+  console.log(data);
   return (
     <Box
       sx={{
