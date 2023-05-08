@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { checkJWT } from "../../constants";
 
+// api
+import userApi from "../../api/userApi";
+import noteApi from "../../api/noteApi";
+import { checkJWT } from "../../constants/function";
 //icons
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
@@ -20,6 +23,20 @@ const cx = classNames.bind(styles);
 
 export default function LandingPage() {
   const [menu, setMenu] = useState(false);
+  const [newUsers, setNewUsers] = useState([]);
+  const [newNotes, setNewNotes] = useState([]);
+
+  useEffect(() => {
+    userApi.getNewUsers().then((res) => setNewUsers(res.data));
+    noteApi.getLastestNotes().then((res) => setNewNotes(res.notes));
+  }, []);
+
+  const diffTime = (lastDate) => {
+    const diffSeconds = Math.floor((new Date() - new Date(lastDate)) / 1000);
+
+    if (!Math.floor(diffSeconds / 60)) return Math.floor(diffSeconds / 60) + " minutes ago";
+    if (!Math.floor(diffSeconds / 3600)) return Math.floor(diffSeconds / 3600) + " hours ago";
+  };
 
   return (
     <div className={cx("wrapper")}>
@@ -46,12 +63,16 @@ export default function LandingPage() {
           <div className={cx("item")}>Help</div>
           <div className={cx("item")}>Blog</div>
           <div className={cx("item")}>Support Forum</div>
-          <div className={cx("item", "login")}>
-            <Link to='/login'>Log in</Link>
-          </div>
-          <div className={cx("item", "signup")}>
-            <Link to='/register'>Sign up</Link>
-          </div>
+          {checkJWT || (
+            <>
+              <div className={cx("item", "login")}>
+                <Link to='/login'>Log in</Link>
+              </div>
+              <div className={cx("item", "signup")}>
+                <Link to='/register'>Sign up</Link>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
@@ -60,10 +81,50 @@ export default function LandingPage() {
           <div className={cx("title")}>{"The simplest way to\n keep notes"}</div>
           <div className={cx("text")}>
             {
-              "All your notes, synced on all your devices. Get Simplenote now for iOS, \nAndroid, Mac, Windows, Linux, or in your browser."
+              "All your notes, synced on all your devices. Get Samnotes now for iOS, Android or in your browser."
             }
           </div>
-          <button className={cx("btn")}>{<Link to='/register'>Sign up now</Link>}</button>
+          <button className={cx("btn")}>
+            {checkJWT ? (
+              <Link to='/home'>Create Notes</Link>
+            ) : (
+              <Link to='/register'>Sign up now</Link>
+            )}
+          </button>
+          <div className={cx("lastest")}>
+            <div className={cx("col")}>
+              <div className={cx("title", "users")}>New Users</div>
+              <div className={cx("items")}>
+                {newUsers.length &&
+                  [...newUsers].slice(0, 5).map((user) => (
+                    <div className={cx("item")} key={user.id}>
+                      <div className={cx("avatar")}>
+                        <img src={user.linkAvatar} alt='' width={24} />
+                      </div>
+                      <div className={cx("detail")}>
+                        <div className={cx("name")}>{user.name}</div>
+                        <div className={cx("gmail")}>{user.user_name}</div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+            <div className={cx("col")}>
+              <div className={cx("title", "notes")}>Lastest Public Notes</div>
+              <div className={cx("items")}>
+                {newNotes.length &&
+                  [...newNotes].slice(0, 5).map((note) => (
+                    <div className={cx("item")} key={note.idNote}>
+                      <div className={cx("title")}>{note.title}</div>
+                      <div>
+                        {note.data.slice(0, 100)}
+                        {note.data.length > 100 && "..."}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
         </section>
         <section>
           <div className={cx("title")}>{"Comprehensive underneath, \nsimple on the surface"}</div>
