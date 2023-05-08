@@ -51,7 +51,7 @@ function ToolsNote(props) {
   const [remindAt, setRemindAt] = useState(options.remindAt);
   const [openLock, setOpenLock] = useState(false);
   const [valueLock, setValueLock] = useState(options.lock);
-  const [notePublic, setNotePublic] = useState(true);
+  const [notePublic, setNotePublic] = useState(options.notePublic);
   const { enqueueSnackbar } = useSnackbar();
   const [showPassword, setShowPassword] = useState(false);
   useEffect(() => {
@@ -88,8 +88,8 @@ function ToolsNote(props) {
     setPopRemind(true);
   };
   const handleNotePublic = () => {
-    setNotePublic((prev) => !prev);
     handleOptionsNote({ notePublic: !notePublic });
+    setNotePublic((prev) => !prev);
   };
   const warningAlert = () => {
     enqueueSnackbar("Sharing is currently unavailable. Try it in the next update", {
@@ -128,6 +128,8 @@ function ToolsNote(props) {
         sx={{
           overflow: "hidden auto",
           height: "calc(100% - 44px)",
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
         }}
       >
         <ListItem>

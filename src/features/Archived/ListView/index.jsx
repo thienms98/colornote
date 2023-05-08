@@ -8,7 +8,6 @@ function ListView({ construct = "Grid", data, setArchivedData, handleDelNote, to
   const [selected, setSelected] = useState(0);
   const clear = () => setSelected(null);
 
-  console.log(data);
   return (
     <Box
       sx={{
@@ -34,6 +33,11 @@ function ListView({ construct = "Grid", data, setArchivedData, handleDelNote, to
                 backgroundColor: `rgba(${item.color.r},${item.color.g},${item.color.b},${item.color.a})`,
                 color: "#000",
                 padding: "10px 0",
+                paddingLeft: "16px",
+                width: "100%",
+                display: "grid",
+                gridTemplateColumns: "50px 1fr",
+                textAlign: "left",
               }}
               onClick={() => setSelected(index)}
             >

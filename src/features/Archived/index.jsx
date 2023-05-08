@@ -22,6 +22,7 @@ function Archived({ data, handleDelNote, setArchivedData, toolsNote }) {
   const [dataFilter, setDataFilter] = useState([]);
   const [construct, setConstruct] = useState("List");
   const { view } = useSelector((state) => state.settings);
+
   useEffect(() => {
     if (value.trim() === "") {
       setDataFilter(data);
@@ -53,6 +54,7 @@ function Archived({ data, handleDelNote, setArchivedData, toolsNote }) {
               textTransform: "capitalize",
               borderRadius: "10px",
               borderColor: "black",
+              width: view && construct === "List" ? "200px" : "auto",
               "&:hover": { borderColor: "black" },
             }}
             startIcon={construct === "Grid" ? <GridViewOutlined /> : <FormatListBulleted />}
@@ -105,7 +107,12 @@ function Archived({ data, handleDelNote, setArchivedData, toolsNote }) {
                         {item?.flag === true ? (
                           <>
                             {item.type === "image" ? (
-                              <NoteImage construct={construct} dataItem={item} />
+                              <NoteImage
+                                construct={construct}
+                                dataItem={item}
+                                setArchivedData={setArchivedData}
+                                handleDelNote={handleDelNote}
+                              />
                             ) : (
                               <NoteItem
                                 construct={construct}
@@ -126,7 +133,12 @@ function Archived({ data, handleDelNote, setArchivedData, toolsNote }) {
                     ) : (
                       <>
                         {item.type === "image" ? (
-                          <NoteImage construct={construct} dataItem={item} />
+                          <NoteImage
+                            construct={construct}
+                            dataItem={item}
+                            setArchivedData={setArchivedData}
+                            handleDelNote={handleDelNote}
+                          />
                         ) : (
                           <NoteItem
                             construct={construct}

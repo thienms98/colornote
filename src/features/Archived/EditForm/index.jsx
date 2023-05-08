@@ -43,7 +43,6 @@ export default function EditForm({ dataItem, handleDelNote, setArchivedData, cle
     share: dataItem.share,
     notePublic: dataItem.notePublic || 1,
   });
-  console.log(options);
 
   const handleChangeNote = (color) => {
     setColorNote(color);

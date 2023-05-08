@@ -59,7 +59,9 @@ function Home(props) {
     remindAt: null,
     lock: null,
     share: null,
+    notePublic: false,
   });
+
   const [pinned, setPinned] = useState(false);
   const { refreshToken } = useJwt({
     token: user?.jwt || JSON.parse(localStorage.getItem("access_token")),
@@ -115,7 +117,7 @@ function Home(props) {
   const handleOpenDrawer = (param) => {
     setType(param);
     setDrawerNew(true);
-    setOptions({ ...options, dueAt: null, remindAt: null, lock: null });
+    setOptions({ ...options, dueAt: null, remindAt: null, lock: null, notePublic: true });
     setColorNote(user.df_color);
   };
   const handleDelNote = async (idNote, type) => {
@@ -150,8 +152,8 @@ function Home(props) {
         typeof options.remindAt === "object" && options.remindAt
           ? dayjs(options.remindAt).format("DD/MM/YYYY hh:mm A Z")
           : options.remindAt,
+      notePublic: options.notePublic ? 1 : 0,
     };
-    console.log(configOptions);
 
     const configParam = {
       ...value,
@@ -160,6 +162,7 @@ function Home(props) {
       type: type,
     };
 
+    console.log("params:      ", configParam);
     try {
       setIsSubmitting(true);
       if (type === "image") {
