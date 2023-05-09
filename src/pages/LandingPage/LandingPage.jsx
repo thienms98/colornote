@@ -15,28 +15,47 @@ import HistoryIcon from "@mui/icons-material/History";
 import TextSnippetIcon from "@mui/icons-material/TextSnippet";
 import InfoIcon from "@mui/icons-material/Info";
 import AppleIcon from "@mui/icons-material/Apple";
+import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 
 //styles
 import classNames from "classnames/bind";
 import styles from "./LandingPage.module.scss";
+import GuestCreateForm from "../../components/GuestCreateForm";
 const cx = classNames.bind(styles);
+
+const diffTime = (lastDate) => {
+  const milliseconds = Math.floor(new Date() - new Date(lastDate));
+
+  let sec = Math.floor(milliseconds / 1000);
+  let min = Math.floor(sec / 60);
+  if (!min) return sec + "seconds ago";
+  let hour = Math.floor(min / 60);
+  if (!hour) return min + " minutes ago";
+  let day = Math.floor(hour / 24);
+  if (!day) return hour + " hours ago";
+  return day + " days ago";
+};
 
 export default function LandingPage() {
   const [menu, setMenu] = useState(false);
   const [newUsers, setNewUsers] = useState([]);
   const [newNotes, setNewNotes] = useState([]);
+  const [currentNote, setCurrentNote] = useState(0);
+  const [modal, setModal] = useState(false);
 
   useEffect(() => {
     userApi.getNewUsers().then((res) => setNewUsers(res.data));
     noteApi.getLastestNotes().then((res) => setNewNotes(res.notes));
   }, []);
 
-  const diffTime = (lastDate) => {
-    const diffSeconds = Math.floor((new Date() - new Date(lastDate)) / 1000);
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setCurrentNote((cr) => (cr + 1 >= newNotes.length - 1 ? 0 : cr + 1));
+    }, 3000);
 
-    if (!Math.floor(diffSeconds / 60)) return Math.floor(diffSeconds / 60) + " minutes ago";
-    if (!Math.floor(diffSeconds / 3600)) return Math.floor(diffSeconds / 3600) + " hours ago";
-  };
+    return () => clearTimeout(timeout);
+  }, [currentNote]);
 
   return (
     <div className={cx("wrapper")}>
@@ -86,7 +105,7 @@ export default function LandingPage() {
           </div>
           <button className={cx("btn")}>
             {checkJWT ? (
-              <Link to='/home'>Create Notes</Link>
+              <div onClick={() => setModal(true)}>Create Notes</div>
             ) : (
               <Link to='/register'>Sign up now</Link>
             )}
@@ -96,32 +115,55 @@ export default function LandingPage() {
               <div className={cx("title", "users")}>New Users</div>
               <div className={cx("items")}>
                 {newUsers.length &&
-                  [...newUsers].slice(0, 5).map((user) => (
-                    <div className={cx("item")} key={user.id}>
-                      <div className={cx("avatar")}>
-                        <img src={user.linkAvatar} alt='' width={24} />
+                  [...newUsers]
+                    .slice(-5)
+                    .reverse()
+                    .map((user) => (
+                      <div className={cx("item")} key={user.id}>
+                        <div className={cx("avatar")}>
+                          <img src={user.linkAvatar} alt='' width={24} />
+                        </div>
+                        <div className={cx("detail")}>
+                          <div className={cx("name")}>{user.name}</div>
+                          <div className={cx("gmail")}>{user.user_name}</div>
+                        </div>
                       </div>
-                      <div className={cx("detail")}>
-                        <div className={cx("name")}>{user.name}</div>
-                        <div className={cx("gmail")}>{user.user_name}</div>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
               </div>
             </div>
             <div className={cx("col")}>
               <div className={cx("title", "notes")}>Lastest Public Notes</div>
               <div className={cx("items")}>
                 {newNotes.length &&
-                  [...newNotes].slice(0, 5).map((note) => (
-                    <div className={cx("item")} key={note.idNote}>
-                      <div className={cx("title")}>{note.title}</div>
-                      <div>
-                        {note.data.slice(0, 100)}
-                        {note.data.length > 100 && "..."}
-                      </div>
-                    </div>
-                  ))}
+                  [...newNotes]
+                    .slice(-5)
+                    .reverse()
+                    .map((data, index) => {
+                      return (
+                        <Note
+                          note={data}
+                          active={index === currentNote}
+                          index={currentNote - index}
+                          key={index}
+                        />
+                      );
+                    })}
+                <div
+                  className={cx("btn", "nxt")}
+                  onClick={() =>
+                    setCurrentNote((cr) => (cr + 1 >= newNotes.length - 1 ? 0 : cr + 1))
+                  }
+                >
+                  <KeyboardArrowRightIcon />
+                </div>
+                <div
+                  className={cx("btn", "prv")}
+                  onClick={() =>
+                    setCurrentNote((cr) => (cr - 1 < 0 ? newNotes.length - 2 : cr - 1))
+                  }
+                >
+                  <KeyboardArrowLeftIcon />
+                </div>
               </div>
             </div>
           </div>
@@ -250,42 +292,6 @@ export default function LandingPage() {
                 <div className={cx("brand")}>App Store</div>
               </div>
             </a>
-            {/* <a className={cx("item")} href='https://google.com'>
-              <div className={cx("icon")}>
-                <AppleIcon />
-              </div>
-              <div className={cx("text")}>
-                <div className={cx("default")}>Download on the</div>
-                <div className={cx("brand")}>Mac App Store</div>
-              </div>
-            </a>
-            <a className={cx("item")} href='https://google.com'>
-              <div className={cx("icon")}>
-                <AppleIcon />
-              </div>
-              <div className={cx("text")}>
-                <div className={cx("default")}>Download on the</div>
-                <div className={cx("brand")}>Play Store</div>
-              </div>
-            </a>
-            <a className={cx("item")} href='https://google.com'>
-              <div className={cx("icon")}>
-                <AppleIcon />
-              </div>
-              <div className={cx("text")}>
-                <div className={cx("default")}>Download on the</div>
-                <div className={cx("brand")}>Windows Store</div>
-              </div>
-            </a>
-            <a className={cx("item")} href='https://google.com'>
-              <div className={cx("icon")}>
-                <AppleIcon />
-              </div>
-              <div className={cx("text")}>
-                <div className={cx("default")}>Download on the</div>
-                <div className={cx("brand")}>Linux</div>
-              </div>
-            </a> */}
           </div>
         </section>
       </div>
@@ -303,6 +309,47 @@ export default function LandingPage() {
         </div>
         <div className={cx("copy")}>&copy; Automatic</div>
       </div>
+
+      {modal && (
+        <div className={cx("modal")}>
+          <div className={cx("overlay")} onClick={() => setModal(false)}></div>
+          <GuestCreateForm clear={() => setModal(false)} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Note({ note, active, index }) {
+  const { r, g, b, a } = note.color;
+
+  return (
+    <div
+      className={cx("note")}
+      style={{
+        backgroundColor: `rgba(${r},${g},${b},${a})`,
+        "--index": index,
+      }}
+    >
+      <div className={cx("title")}>
+        {note.title}
+        <span>{diffTime(note.createAt)}</span>
+      </div>
+      {(note.type === "text" || note.type === "image") && (
+        <div className={cx("content")}>{note.data}</div>
+      )}
+      {note.metaData && (
+        <div className={cx("image")}>
+          <img src={note.metaData} alt='' />
+        </div>
+      )}
+      {note.type === "checklist" &&
+        note.data.map((item) => (
+          <div>
+            <input type='checkbox' disabled checked={item.status} />
+            {item.content}
+          </div>
+        ))}
     </div>
   );
 }

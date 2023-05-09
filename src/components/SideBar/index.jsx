@@ -10,6 +10,7 @@ import {
   TextSnippetOutlined,
   Visibility,
   VisibilityOff,
+  GridView,
 } from "@mui/icons-material";
 import {
   Button,
@@ -91,6 +92,11 @@ function SideBar({ handleOpenDrawer, drawerNew }) {
     }
   };
   const icons = [
+    <GridView
+      style={{
+        color: "#44546F",
+      }}
+    />,
     <CalendarMonth
       style={{
         color: "#44546F",
@@ -225,7 +231,7 @@ function SideBar({ handleOpenDrawer, drawerNew }) {
 
       <Box className='nav' sx={{ marginTop: 4 }}>
         <List>
-          {["Calendar", "Archived", "Screenshot", "Deleted", "Settings", "Groups"].map(
+          {["Explore", "Calendar", "Archived", "Screenshot", "Deleted", "Settings", "Groups"].map(
             (text, index) => (
               <ListItem
                 key={text}
