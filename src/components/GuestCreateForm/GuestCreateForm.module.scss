@@ -137,13 +137,53 @@
       color: rgba(0,0,0,0.7)
     }
   }
+
+  &>label{
+    width: 100%;
+    min-height: 100px;
+    position: relative;
+
+    &:hover:before{
+      opacity: 1;
+    }
+    &::before{
+      content: 'Select Other Image';
+      opacity: 0;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      font-size: 24px;
+      font-weight: 700;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(0,0,0,0.3);
+      cursor: pointer;
+    }
+
+    &>img{
+      width: 100%;
+      object-fit: contain;
+    }
+  }
+}
+
+.options{
+  width: 100%;
+  border-radius: 8px;
+  background-color: rgb(234, 245, 247);
+  padding: 16px;
+  box-sizing: border-box;
 }
 
 .colors{
+  width: 100%;
   display: flex;
   flex-direction: row;
   margin: 0 auto;
-  gap: 8px;
+  gap: 16px;
 
   .color{
     width: 30px;
@@ -155,6 +195,44 @@
 
     &.selected{
       border-color: #000;
+    }
+  }
+}
+
+.others{
+  width: 100%;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+
+  &>.item{
+    min-height: 60px;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: #000;
+    font-size: 20px;
+    gap: 16px;
+    
+    &:hover .picker{
+      transform: scale(1);
+    }
+    .icon{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: rgba(0, 0, 0, 0.54);
+    }
+
+    .picker{
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: scale(0);
+      width: 100%;
+      height: 100%;
     }
   }
 }

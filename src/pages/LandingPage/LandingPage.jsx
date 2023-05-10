@@ -15,6 +15,7 @@ import HistoryIcon from "@mui/icons-material/History";
 import TextSnippetIcon from "@mui/icons-material/TextSnippet";
 import InfoIcon from "@mui/icons-material/Info";
 import AppleIcon from "@mui/icons-material/Apple";
+import AndroidIcon from "@mui/icons-material/Android";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 
@@ -45,13 +46,13 @@ export default function LandingPage() {
   const [modal, setModal] = useState(false);
 
   useEffect(() => {
-    userApi.getNewUsers().then((res) => setNewUsers(res.data));
-    noteApi.getLastestNotes().then((res) => setNewNotes(res.notes));
+    userApi.getNewUsers().then((res) => setNewUsers(res.data.reverse().slice(0, 5)));
+    noteApi.getLastestNotes().then((res) => setNewNotes(res.notes.reverse().slice(0, 5)));
   }, []);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setCurrentNote((cr) => (cr + 1 >= newNotes.length - 1 ? 0 : cr + 1));
+      setCurrentNote((cr) => (cr + 1 > newNotes.length - 1 ? 0 : cr + 1));
     }, 3000);
 
     return () => clearTimeout(timeout);
@@ -105,7 +106,7 @@ export default function LandingPage() {
           </div>
           <button className={cx("btn")}>
             {checkJWT ? (
-              <div onClick={() => setModal(true)}>Create Notes</div>
+              <div onClick={() => setModal(true)}>Create Public Notes</div>
             ) : (
               <Link to='/register'>Sign up now</Link>
             )}
@@ -115,43 +116,37 @@ export default function LandingPage() {
               <div className={cx("title", "users")}>New Users</div>
               <div className={cx("items")}>
                 {newUsers.length &&
-                  [...newUsers]
-                    .slice(-5)
-                    .reverse()
-                    .map((user) => (
-                      <div className={cx("item")} key={user.id}>
-                        <div className={cx("avatar")}>
-                          <img src={user.linkAvatar} alt='' width={24} />
-                        </div>
-                        <div className={cx("detail")}>
-                          <div className={cx("name")}>{user.name}</div>
-                          <div className={cx("gmail")}>{user.user_name}</div>
-                        </div>
+                  [...newUsers].slice(-5).map((user) => (
+                    <div className={cx("item")} key={user.id}>
+                      <div className={cx("avatar")}>
+                        <img src={user.linkAvatar} alt='' width={24} />
                       </div>
-                    ))}
+                      <div className={cx("detail")}>
+                        <div className={cx("name")}>{user.name}</div>
+                        <div className={cx("gmail")}>{user.user_name}</div>
+                      </div>
+                    </div>
+                  ))}
               </div>
             </div>
             <div className={cx("col")}>
               <div className={cx("title", "notes")}>Lastest Public Notes</div>
               <div className={cx("items")}>
                 {newNotes.length &&
-                  [...newNotes]
-                    .slice(-5)
-                    .reverse()
-                    .map((data, index) => {
-                      return (
-                        <Note
-                          note={data}
-                          active={index === currentNote}
-                          index={currentNote - index}
-                          key={index}
-                        />
-                      );
-                    })}
+                  [...newNotes].map((data, index) => {
+                    return (
+                      <Note
+                        note={data}
+                        active={index === currentNote}
+                        index={currentNote - index}
+                        key={index}
+                      />
+                    );
+                  })}
                 <div
                   className={cx("btn", "nxt")}
                   onClick={() =>
-                    setCurrentNote((cr) => (cr + 1 >= newNotes.length - 1 ? 0 : cr + 1))
+                    setCurrentNote((cr) => (cr + 1 > newNotes.length - 1 ? 0 : cr + 1))
                   }
                 >
                   <KeyboardArrowRightIcon />
@@ -159,7 +154,7 @@ export default function LandingPage() {
                 <div
                   className={cx("btn", "prv")}
                   onClick={() =>
-                    setCurrentNote((cr) => (cr - 1 < 0 ? newNotes.length - 2 : cr - 1))
+                    setCurrentNote((cr) => (cr - 1 < 0 ? newNotes.length - 1 : cr - 1))
                   }
                 >
                   <KeyboardArrowLeftIcon />
@@ -290,6 +285,19 @@ export default function LandingPage() {
               <div className={cx("text")}>
                 <div className={cx("default")}>Download on the</div>
                 <div className={cx("brand")}>App Store</div>
+              </div>
+            </a>
+            <a
+              href='https://dl.dropboxusercontent.com/s/yjvy18lzp0f40ss/colornote-10-5-2023.apk'
+              className={cx("item")}
+              target='blank'
+            >
+              <div className={cx("icon")}>
+                <AndroidIcon />
+              </div>
+              <div className={cx("text")}>
+                <div className={cx("default")}>Download</div>
+                <div className={cx("brand")}>APK File</div>
               </div>
             </a>
           </div>

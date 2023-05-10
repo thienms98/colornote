@@ -159,7 +159,6 @@ function Home(props) {
       type: type,
     };
 
-    console.log("params:      ", configParam);
     try {
       setIsSubmitting(true);
       if (type === "image") {
