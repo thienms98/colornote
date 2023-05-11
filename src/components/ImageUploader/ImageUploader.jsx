@@ -1,26 +1,47 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { uploadFile } from "@uploadcare/upload-client";
-import { uploadCareKeys } from "../../constants";
+import { fileInfo, UploadcareSimpleAuthSchema } from "@uploadcare/rest-client";
+import { uploadCareUrl } from "../../constants/uploadCare";
 
 // import classNames from 'classnames/bind'
 // import styles from './ImageUploader.module.scss'
 // const cx = classNames.bind(styles)
 
 export default function ImageUploader() {
-  const [fileData, setFileData] = useState(null);
+  const [fileName, setFileName] = useState("");
+  const [fileUUID, setFileUUID] = useState("e7f01ac2-4091-49b1-a185-9ac089bf4647");
+  const [fileUrl, setFileUrl] = useState("");
+
   // fileData must be `Blob`, `File`, `Buffer`, UUID, CDN URL or Remote URL
-  async function upload(fileData) {
+  const upload = async (fileData) => {
     const result = await uploadFile(fileData, {
-      publicKey: uploadCareKeys.PUBLIC_KEY,
+      publicKey: process.env.REACT_APP_UPLOADCARE_PUBLIC_KEY,
       store: "auto",
       metadata: {
-        subsystem: "uploader",
-        pet: "cat",
+        subsystem: "js-client",
+        name: fileName.replace(/.png/g, ""),
       },
     });
-    console.log(`URL: ${result.cdnUrl}`);
-  }
-  upload();
+    setFileUUID(result.uuid);
+  };
+
+  useEffect(() => {
+    if (!fileUUID) return;
+    const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
+      publicKey: "5ba79114515337330f64",
+      secretKey: "f24cb51945082fd09222",
+    });
+
+    fileInfo(
+      {
+        uuid: fileUUID,
+      },
+      { authSchema: uploadcareSimpleAuthSchema }
+    ).then((result) => {
+      console.log(result);
+      setFileUrl(result.originalFileUrl);
+    });
+  }, [fileUUID]);
 
   return (
     <>
@@ -30,9 +51,16 @@ export default function ImageUploader() {
           upload(new Blob(e.target.file.files));
         }}
       >
-        <input type='file' name='file' id='' onChange={(e) => console.log(e.target.files)} />
+        <input
+          type='file'
+          name='file'
+          id=''
+          onChange={(e) => setFileName(e.target.files[0].name)}
+        />
         <input type='submit' value='Upload' />
       </form>
+
+      <img src={fileUrl} alt='' width={500} />
     </>
   );
 }
