@@ -44,6 +44,7 @@ export default function LandingPage() {
   const [newNotes, setNewNotes] = useState([]);
   const [currentNote, setCurrentNote] = useState(0);
   const [modal, setModal] = useState(false);
+  const [largeNote, setLargeNote] = useState(-1);
 
   useEffect(() => {
     userApi.getNewUsers().then((res) => setNewUsers(res.data.reverse().slice(0, 5)));
@@ -138,12 +139,17 @@ export default function LandingPage() {
                 {newNotes.length &&
                   [...newNotes].map((data, index) => {
                     return (
-                      <Note
-                        note={data}
-                        active={index === currentNote}
-                        index={currentNote - index}
-                        key={index}
-                      />
+                      <div onClick={() => setLargeNote(index)}>
+                        <Note
+                          clearLarge={() => {
+                            setLargeNote(-1);
+                          }}
+                          note={data}
+                          active={index === currentNote}
+                          index={currentNote - index}
+                          key={index}
+                        />
+                      </div>
                     );
                   })}
                 <div
@@ -327,21 +333,32 @@ export default function LandingPage() {
           <GuestCreateForm clear={() => setModal(false)} />
         </div>
       )}
+
+      {largeNote >= 0 && (
+        <Note
+          clearLarge={() => {
+            setLargeNote(-1);
+          }}
+          note={newNotes[largeNote]}
+          large={true}
+        />
+      )}
     </div>
   );
 }
 
-function Note({ note, active, index }) {
+function Note({ note, active, index, large = false, clearLarge }) {
   const { r, g, b, a } = note.color;
 
   return (
     <div
-      className={cx("note")}
+      className={cx("note", { large: large })}
       style={{
         backgroundColor: `rgba(${r},${g},${b},${a})`,
         "--index": index,
       }}
     >
+      {large && <div className={cx("overlay")} onClick={clearLarge}></div>}
       <div className={cx("title")}>
         {note.title}
         <span>{diffTime(note.createAt)}</span>

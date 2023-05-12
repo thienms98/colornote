@@ -423,6 +423,7 @@ function Home(props) {
                   options={options}
                   handleChangeNote={handleChangeNote}
                   handleOptionsNote={handleOptionsNote}
+                  handleNoteForm={handleNoteForm}
                 />
               </Box>
             </Box>

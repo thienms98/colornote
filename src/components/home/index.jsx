@@ -57,7 +57,7 @@ function Home(props) {
     remindAt: null,
     lock: null,
     share: null,
-    notePublic: false,
+    notePublic: 0,
   });
 
   const [pinned, setPinned] = useState(false);
@@ -423,6 +423,7 @@ function Home(props) {
                   options={options}
                   handleChangeNote={handleChangeNote}
                   handleOptionsNote={handleOptionsNote}
+                  handleNoteForm={handleNoteForm}
                 />
               </Box>
             </Box>

@@ -43,8 +43,14 @@ const TransparentTooltip = styled(({ className, ...props }) => (
     backgroundColor: "transparent",
   },
 }));
-function ToolsNote(props) {
-  const { handleChangeNote, handleOptionsNote, options } = props;
+function ToolsNote({
+  handleNoteForm,
+  handleChangeNote,
+  handleOptionsNote,
+  options,
+  dataItem,
+  type = "none",
+}) {
   const [popDate, setPopDate] = useState(false);
   const [popRemind, setPopRemind] = useState(false);
   const [dueAt, setDueAt] = useState(options.dueAt);
@@ -54,11 +60,20 @@ function ToolsNote(props) {
   const [notePublic, setNotePublic] = useState(options.notePublic);
   const { enqueueSnackbar } = useSnackbar();
   const [showPassword, setShowPassword] = useState(false);
+
+  // useEffect(() => {
+  //   setDueAt(options.dueAt && dayjs(options.dueAt));
+  //   setRemindAt(options.remindAt && dayjs(options.remindAt));
+  //   setValueLock(options.lock);
+  // }, [options.dueAt, options.remindAt, options.lock]);
+
   useEffect(() => {
-    setDueAt(options.dueAt && dayjs(options.dueAt));
-    setRemindAt(options.remindAt && dayjs(options.remindAt));
-    setValueLock(options.lock);
-  }, [options.dueAt]);
+    if (type === "Edit") handleNoteForm(dataItem);
+
+    return;
+  }, [remindAt, dueAt, notePublic]);
+  console.log(remindAt, dueAt, notePublic);
+
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
@@ -88,8 +103,8 @@ function ToolsNote(props) {
     setPopRemind(true);
   };
   const handleNotePublic = () => {
-    handleOptionsNote({ notePublic: !notePublic });
-    setNotePublic((prev) => !prev);
+    handleOptionsNote({ notePublic: notePublic === 0 ? 1 : 0 });
+    setNotePublic((prev) => (prev === 0 ? 1 : 0));
   };
   const warningAlert = () => {
     enqueueSnackbar("Sharing is currently unavailable. Try it in the next update", {

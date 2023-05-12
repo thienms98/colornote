@@ -58,7 +58,7 @@ function NoteItem({ dataItem, handleDelNote, setArchivedData, construct, full = 
     remindAt: typeof dataItem.remindAt !== "object" ? dayjs(dataItem.remindAt) : dataItem.remindAt,
     lock: dataItem.lock,
     share: dataItem.share,
-    notePublic: dataItem.notePublic || true,
+    notePublic: dataItem.notePublic,
   });
 
   const handleChange = async (id) => {
@@ -252,6 +252,9 @@ function NoteItem({ dataItem, handleDelNote, setArchivedData, construct, full = 
               options={options}
               handleChangeNote={handleChangeNote}
               handleOptionsNote={handleOptionsNote}
+              handleNoteForm={handleNoteForm}
+              dataItem={dataItem}
+              type={"Edit"}
             />
           </Box>
         </Box>
