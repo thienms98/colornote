@@ -41,7 +41,7 @@ export default function EditForm({ dataItem, handleDelNote, setArchivedData, cle
     remindAt: typeof dataItem.remindAt !== "object" ? dayjs(dataItem.remindAt) : dataItem.remindAt,
     lock: dataItem.lock,
     share: dataItem.share,
-    notePublic: dataItem.notePublic || 1,
+    notePublic: dataItem.notePublic,
   });
 
   const handleChangeNote = (color) => {
@@ -61,6 +61,7 @@ export default function EditForm({ dataItem, handleDelNote, setArchivedData, cle
         typeof options.remindAt === "object" && options.remindAt
           ? dayjs(options.remindAt).format("DD/MM/YYYY hh:mm A Z")
           : options.remindAt,
+      notePublic: options.notePublic ? 1 : 0,
     };
     const configParam = {
       ...value,
