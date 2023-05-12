@@ -38,6 +38,7 @@ function Home(props) {
   const [user, setUser] = useState(
     useSelector((state) => state.user.current) || JSON.parse(localStorage.getItem("user"))
   );
+
   const [isLogin, setIsLogin] = useState(false);
   const [colorNote, setColorNote] = useState(user.df_color);
   const [df_nav, setDf_nav] = useState(user.df_screen);

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 
 import axios from "axios";
 import noteApi from "../../api/noteApi";
@@ -9,10 +10,24 @@ import ShareIcon from "@mui/icons-material/Share";
 import PublicIcon from "@mui/icons-material/Public";
 import LockIcon from "@mui/icons-material/Lock";
 import PersonIcon from "@mui/icons-material/Person";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
+import dayjs from "dayjs";
 import { colorBucket } from "../../constants/color_bucket";
 import { useSnackbar } from "notistack";
 import { DateTimePicker } from "@mui/x-date-pickers";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  FormControl,
+  InputLabel,
+  IconButton,
+  InputAdornment,
+  Button,
+  Input,
+} from "@mui/material";
 
 import classNames from "classnames/bind";
 import styles from "./GuestCreateForm.module.scss";
@@ -21,6 +36,8 @@ const cx = classNames.bind(styles);
 export default function GuestCreateForm({ clear }) {
   const [showTypes, setShowTypes] = useState(false);
 
+  // params for craeting note
+  const user = useSelector((state) => state.user.current);
   const [title, setTitle] = useState("");
   const [type, setType] = useState("text");
   const [color, setColor] = useState("color_1");
@@ -31,8 +48,35 @@ export default function GuestCreateForm({ clear }) {
   const [reminder, setReminder] = useState(null);
   const [lock, setLock] = useState(null);
   const [share, setShare] = useState(null);
-  const [notePublic, setNotePublic] = useState(true);
   const [pinned, setPinned] = useState(false);
+
+  // handle Lock Dialog
+  const [showPassword, setShowPassword] = useState(false);
+  const [openLock, setOpenLock] = useState(false);
+  const [valueLock, setValueLock] = useState(lock);
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
+  const handleClickShowPassword = () => {
+    setShowPassword((x) => !x);
+  };
+  const handleCloseLock = () => {
+    setOpenLock(false);
+  };
+  const handleOkLock = () => {
+    setOpenLock(false);
+    if (valueLock.length > 0) {
+      setLock(valueLock);
+    } else {
+      setLock(null);
+    }
+  };
+  const handleRemoveLock = () => {
+    setOpenLock(false);
+    setValueLock("");
+    setLock(null);
+  };
+  //
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -40,21 +84,26 @@ export default function GuestCreateForm({ clear }) {
     let params = {
       color: colorBucket[color],
       data,
-      dueAt,
+      dueAt:
+        typeof dueAt === "object" && dueAt ? dayjs(dueAt).format("DD/MM/YYYY hh:mm A Z") : dueAt,
+      remindAt:
+        typeof reminder === "object" && reminder
+          ? dayjs(reminder).format("DD/MM/YYYY hh:mm A Z")
+          : reminder,
       lock,
-      notePublic: notePublic ? 1 : 0,
+      notePublic: 1,
       pinned,
-      remindAt: reminder,
       share,
       title,
       type,
     };
     if (type === "image") params = { ...params, metaData };
     try {
-      const res = await noteApi.createNote(0, params);
-      console.log(res);
+      const res = await noteApi.createNote(user.id, params);
+      enqueueSnackbar("Note was created successfully", { variant: "success" });
+      clear();
     } catch (err) {
-      console.log(err);
+      enqueueSnackbar(err.message, { variant: "error" });
     }
   };
 
@@ -152,12 +201,13 @@ export default function GuestCreateForm({ clear }) {
                 className={cx("color", { selected: color === key })}
                 style={{ "--bgc": `rgba(${r},${g},${b},${a})` }}
                 onClick={() => setColor(key)}
+                key={index}
               ></div>
             );
           })}
         </div>
         <div className={cx("others")}>
-          <div className={cx("item")}>
+          <div className={cx("item", { show: reminder })}>
             <div className={cx("icon")}>
               <NotificationsActiveIcon />
             </div>
@@ -173,20 +223,28 @@ export default function GuestCreateForm({ clear }) {
                 onChange={(newValue) => setReminder(newValue)}
               />
             </div>
+            {reminder && (
+              <div className={cx("clear-btn")} onClick={() => setReminder(null)}>
+                &times;
+              </div>
+            )}
           </div>
-          <div className={cx("item")}>
+          <div
+            className={cx("item")}
+            onClick={() => enqueueSnackbar("Feature is under development", { variant: "warning" })}
+          >
             <div className={cx("icon")}>
               <ShareIcon />
             </div>
             <div className={cx("name")}>Share</div>
           </div>
-          <div className={cx("item")}>
+          <div className={cx("item")} onClick={() => setOpenLock(true)}>
             <div className={cx("icon")}>
               <LockIcon />
             </div>
             <div className={cx("name")}>Lock</div>
           </div>
-          <div className={cx("item")}>
+          <div className={cx("item", { show: dueAt })}>
             <div className={cx("icon")}>
               <CalendarMonthIcon />
             </div>
@@ -202,13 +260,61 @@ export default function GuestCreateForm({ clear }) {
                 onChange={(newValue) => setDueAt(newValue)}
               />
             </div>
+            {dueAt && (
+              <div className={cx("clear-btn")} onClick={() => setDueAt(null)}>
+                &times;
+              </div>
+            )}
           </div>
-          <div className={cx("item")} onClick={() => setNotePublic((prev) => !prev)}>
-            <div className={cx("icon")}>{notePublic ? <PublicIcon /> : <PersonIcon />}</div>
-            <div className={cx("name")}>{notePublic ? "Public" : "Private"}</div>
+          <div className={cx("item")}>
+            <div className={cx("icon")}>
+              <PublicIcon />
+            </div>
+            <div className={cx("name")}>Public</div>
           </div>
         </div>
       </div>
+      <Dialog
+        open={openLock}
+        onClose={handleCloseLock}
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+        }}
+      >
+        <DialogContent>
+          <DialogContentText>
+            To protect your notes, lock them carefully. <b>Notice:</b> We have not yet provided any
+            method to recover your password when you forget it. Thanks
+          </DialogContentText>
+          <FormControl fullWidth sx={{ marginTop: "10px" }} variant='standard'>
+            <InputLabel htmlFor='lock-password'>Lock by password</InputLabel>
+            <Input
+              id='lock-password'
+              type={showPassword ? "text" : "password"}
+              value={valueLock || ""}
+              onChange={(e) => setValueLock(e.target.value)}
+              endAdornment={
+                <InputAdornment position='end'>
+                  <IconButton
+                    aria-label='toggle password visibility'
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              }
+            />
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleRemoveLock}>Remove</Button>
+          <Button onClick={handleCloseLock}>Cancel</Button>
+          <Button onClick={handleOkLock}>Ok</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
@@ -243,7 +349,7 @@ function Checklist({ updateData }) {
       {list.length > 0 &&
         list.map((item, index) => {
           return (
-            <div className={cx("item")}>
+            <div className={cx("item")} key={index}>
               <input type='checkbox' checked={item.status} onChange={() => updateStatus(index)} />
               <input
                 type='text'

@@ -200,10 +200,11 @@
 }
 
 .others{
+  margin-top: 20px;
   width: 100%;
   display: grid;
   gap: 16px;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
 
   &>.item{
     min-height: 60px;
@@ -215,6 +216,10 @@
     color: #000;
     font-size: 20px;
     gap: 16px;
+
+    &.show .picker{
+      transform: scale(1);
+    }
     
     &:hover .picker{
       transform: scale(1);
@@ -233,6 +238,21 @@
       transform: scale(0);
       width: 100%;
       height: 100%;
+    }
+
+    .clear-btn{
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      font-size: 32px;
+      z-index: 5;
+
+      &:hover{
+        color: red;
+      }
     }
   }
 }

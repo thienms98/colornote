@@ -79,11 +79,14 @@ export default function LandingPage() {
           <div className={cx("item")}>
             <Link to='/home'>Home</Link>
           </div>
+          {/* <div className={cx("item")}>
+            <Link to='/upload'>Upload</Link>
+          </div> */}
           <div className={cx("item")}>Contact Us</div>
           <div className={cx("item")}>Help</div>
           <div className={cx("item")}>Blog</div>
           <div className={cx("item")}>Support Forum</div>
-          {checkJWT || (
+          {checkJWT() || (
             <>
               <div className={cx("item", "login")}>
                 <Link to='/login'>Log in</Link>
