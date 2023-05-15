@@ -28,7 +28,8 @@ function ListView({ construct = "Grid", data, setArchivedData, handleDelNote, to
       >
         {data.map((item, index) => (
           <>
-            <Button
+            <Button 
+              
               sx={{
                 backgroundColor: `rgba(${item.color.r},${item.color.g},${item.color.b},${item.color.a})`,
                 color: "#000",

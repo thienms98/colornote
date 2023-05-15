@@ -6,7 +6,7 @@ import Login from "./features/Auth/Login";
 import Register from "./features/Auth/Register";
 import ImageUploader from "./components/ImageUploader/ImageUploader";
 import { checkJWT } from "./constants";
-
+import GroupDetail from "./components/GroupDetail"
 function App() {
   if (localStorage.getItem("show") !== "false") {
     localStorage.setItem("show", true);
@@ -27,6 +27,7 @@ function App() {
         />
         <Route path='/home/*' element={<Home />} />
         <Route path='/upload' element={<ImageUploader />} />
+        <Route path="/group/:idGroup/*" element={<GroupDetail/>} />
       </Routes>
     </div>
   );

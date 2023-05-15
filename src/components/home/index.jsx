@@ -6,7 +6,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import noteApi from "../../api/noteApi";
-import { checkJWT } from "../../constants";
+import { STATIC_HOST, checkJWT } from "../../constants";
 import { Archived, CalendarTable, Deleted, Setting, Explore } from "../../features";
 import PinnedIcon from "../CustomIcons/PinnedIcon";
 import CheckListBox from "../FieldNote/CheckListFieldBox";
@@ -22,6 +22,8 @@ import axios from "axios";
 import { refresh } from "../../features/Auth/userSlice";
 import { useJwt } from "react-jwt";
 import Screenshot from "../../features/Screenshot";
+import { io } from "socket.io-client";
+import { socketActions } from "../socketSlice";
 Home.propTypes = {};
 const theme = createTheme({
   palette: {
@@ -100,7 +102,12 @@ function Home(props) {
   const [files, setFiles] = useState([]);
   const imgRef = useRef(null);
   const fileImg = useRef(null);
-
+  let socket=useRef()
+  useEffect(() => {
+          socket.current = io(STATIC_HOST);
+          dispatch(socketActions.setSocket(socket.current));
+      
+  }, []);
   useEffect(() => {
     const im = imgRef.current;
 

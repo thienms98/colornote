@@ -20,9 +20,9 @@ const userApi = {
     const url = "/user/" + id;
     return axiosClient.post(url, data);
   },
-  getAll() {
-    const url = "/allUsers";
-    return axiosClient.get(url);
+  getAll(id) {
+    const url = '/allUsers/' + id
+    return axiosClient.get(url)
   },
   lock2(id, data) {
     const url = "/create-pass-2/" + id;

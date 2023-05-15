@@ -72,7 +72,7 @@ function ToolsNote({
 
     return;
   }, [remindAt, dueAt, notePublic]);
-  console.log(remindAt, dueAt, notePublic);
+
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
