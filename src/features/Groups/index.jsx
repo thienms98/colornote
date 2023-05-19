@@ -25,23 +25,32 @@ import userApi from "../../api/userApi";
 import { useSelector } from "react-redux";
 import groupApi from "../../api/groupApi";
 import { useSnackbar } from "notistack";
+import GroupItem from "../../components/GroupItem";
 Groups.propTypes = {};
 
 function Groups(props) {
     const [value, setValue] = useState("");
-    const user=useSelector((state)=>state.user.current)
+    const user =
+        useSelector((state) => state.user.current) || JSON.parse(localStorage.getItem("user"));
     const [dataFilter, setDataFilter] = useState([]);
-    const [allUser,SetAllUser]=useState([])
+    const [allUser,setAllUser]=useState([])
     const [open, setOpen] = useState(false);
+    const [allGroup,setAllGroup]=useState([])
     const [members,setMembers]=useState([]);
     const {enqueueSnackbar}=useSnackbar();
     const [isSubmitting,setIsSubmitting]=useState(false)
+
     useEffect(()=>{
         (async ()=>{
             try {
-                const {data}= await userApi.getAll()
+                const {data}= await userApi.getAll(user.id)
+                const res= await groupApi.getAllGroups(user.id)
+                if(res.data){
+                    setAllGroup(res.data)
+                    setDataFilter(res.data)
+                }
                 if(data){
-                    SetAllUser(data)
+                    setAllUser(data)
                 }
             } catch (error) {
                 
@@ -76,8 +85,13 @@ function Groups(props) {
         const data={...values,members:[...members,{id:user.id,gmail:user.gmail,role:"Owner"}]}
         try {
             setIsSubmitting(true)
-            await groupApi.createGroup(data)
+            const res=await groupApi.createGroup(user.id,data)
             setIsSubmitting(false)
+            enqueueSnackbar(res.message,{variant:"success"})
+            const newData=[...allGroup,res.group]
+            setAllGroup(newData)
+            setDataFilter(newData)
+            handleCloseCreateGroup()
         } catch (error) {
             setIsSubmitting(false)
             enqueueSnackbar(error.message,{variant:"error"})
@@ -159,7 +173,9 @@ function Groups(props) {
                     spacing={{ xs: 1, sm: 2, md: 2, lg: 2 }}
                 >
                     {dataFilter.map((item) => (
-                        <Grid item xs={24} sm={12} md={4}></Grid>
+                        <Grid key={item.idGroup} item xs={24} sm={12} md={4} lg={3}>
+                            <GroupItem dataItem={item}/>
+                        </Grid>
                     ))}
                 </Grid>
             </div>

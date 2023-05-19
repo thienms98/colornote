@@ -23,3 +23,8 @@ export function checkJWT(){
 export function convertColor(object_color){
     return `rgba(${object_color.r},${object_color.g},${object_color.b},${object_color.a})`
 }
+export function reName(n) {
+    const x = n.split(" ");
+    const rs = x[0][0].toUpperCase() + x[x.length - 1][0].toUpperCase();
+    return rs;
+};
