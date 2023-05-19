@@ -1,3 +1,6 @@
+import React, { useEffect, useState, useContext } from "react";
+import PropTypes from "prop-types";
+
 import { CalendarMonth, Lock, Public, Share, Visibility, VisibilityOff } from "@mui/icons-material";
 import {
   Box,
@@ -22,13 +25,12 @@ import {
 } from "@mui/material";
 import { MobileDateTimePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
-import PropTypes from "prop-types";
-import React, { useEffect, useState } from "react";
 import { colorBucket } from "../../constants";
+
 import ColorBox from "../ColorBox";
 import RemindIcon from "../CustomIcons/RemindIcon";
-
 import { useSnackbar } from "notistack";
+import { ShareNoteContext } from "../home";
 
 ToolsNote.propTypes = {
   handleChangeNote: PropTypes.func.isRequired,
@@ -61,6 +63,7 @@ function ToolsNote({
   const { enqueueSnackbar } = useSnackbar();
   const [showPassword, setShowPassword] = useState(false);
 
+  const shareNoteId = useContext(ShareNoteContext);
   // useEffect(() => {
   //   setDueAt(options.dueAt && dayjs(options.dueAt));
   //   setRemindAt(options.remindAt && dayjs(options.remindAt));
@@ -68,11 +71,15 @@ function ToolsNote({
   // }, [options.dueAt, options.remindAt, options.lock]);
 
   useEffect(() => {
-    if (type === "Edit") handleNoteForm(dataItem);
-
+    if (
+      type === "Edit" &&
+      (remindAt !== options.remindAt ||
+        dueAt !== options.dueAt ||
+        notePublic !== options.notePublic)
+    )
+      handleNoteForm(dataItem);
     return;
   }, [remindAt, dueAt, notePublic]);
-
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
@@ -259,7 +266,10 @@ function ToolsNote({
                 borderRadius: "10px",
               },
             }}
-            onClick={warningAlert}
+            onClick={() => {
+              shareNoteId(dataItem.idNote);
+              console.log(dataItem.idNote);
+            }}
           >
             <ListItemIcon>
               <Share />

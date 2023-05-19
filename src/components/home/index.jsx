@@ -2,7 +2,7 @@ import { Add, Delete, KeyboardArrowRight, RemoveRedEye } from "@mui/icons-materi
 import { Box, Button, Drawer, IconButton, LinearProgress, Stack, createTheme } from "@mui/material";
 import dayjs from "dayjs";
 import { useSnackbar } from "notistack";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, createContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import noteApi from "../../api/noteApi";
@@ -11,6 +11,7 @@ import { Archived, CalendarTable, Deleted, Setting, Explore } from "../../featur
 import PinnedIcon from "../CustomIcons/PinnedIcon";
 import CheckListBox from "../FieldNote/CheckListFieldBox";
 import TextFieldBox from "../FieldNote/TextFieldBox";
+import SharePopup from "../SharePopup";
 import Footer from "../Footer";
 import ReleaseDoc from "../ReleaseDoc";
 import SideBar from "../SideBar";
@@ -34,6 +35,8 @@ const theme = createTheme({
   },
 });
 
+export const ShareNoteContext = createContext(null);
+
 function Home(props) {
   const { enqueueSnackbar } = useSnackbar();
 
@@ -41,6 +44,7 @@ function Home(props) {
     useSelector((state) => state.user.current) || JSON.parse(localStorage.getItem("user"))
   );
 
+  const [sharedNoteId, setSharedNoteId] = useState(null);
   const [isLogin, setIsLogin] = useState(false);
   const [colorNote, setColorNote] = useState(user.df_color);
   const [df_nav, setDf_nav] = useState(user.df_screen);
@@ -102,11 +106,10 @@ function Home(props) {
   const [files, setFiles] = useState([]);
   const imgRef = useRef(null);
   const fileImg = useRef(null);
-  let socket=useRef()
+  let socket = useRef();
   useEffect(() => {
-          socket.current = io(STATIC_HOST);
-          dispatch(socketActions.setSocket(socket.current));
-      
+    socket.current = io(STATIC_HOST);
+    dispatch(socketActions.setSocket(socket.current));
   }, []);
   useEffect(() => {
     const im = imgRef.current;
@@ -249,256 +252,256 @@ function Home(props) {
     pathname.split("/")[2] === "groups"
   );
   return (
-    <div>
-      {isLogin && (
-        <div
-          style={{
-            width: "100vw",
-            height: "100vh",
-            backgroundImage: "linear-gradient(to right,#D0FADE, rgba(255, 134, 250, 0.2))",
-            overflow: "hidden",
-          }}
-          className={"df_size"}
-        >
-          {release && <ReleaseDoc />}
-          <SideBar handleOpenDrawer={handleOpenDrawer} drawerNew={drawerNew} />
-
-          {view && (
-            <img
-              style={{
-                position: "absolute",
-                top: "50%",
-                right: "20px",
-                zIndex: "1",
-                transform: "translateY(-50%)",
-              }}
-              src='../../../assets/home-icon.png'
-              alt='homeicon'
-            />
-          )}
-          <Drawer
-            variant='persistent'
-            className='box-container'
-            anchor='right'
-            open={drawerNew}
-            sx={{
-              width: "400px",
-              position: "relative",
-              flexShrink: 0,
-              [`& .MuiDrawer-paper`]: {
-                width: "400px",
-                boxSizing: "border-box",
-                height: "calc(100% - 65px)",
-              },
+    <ShareNoteContext.Provider value={(id) => setSharedNoteId(id)}>
+      <div>
+        <SharePopup noteId={sharedNoteId} />
+        {isLogin && (
+          <div
+            style={{
+              width: "100vw",
+              height: "100vh",
+              backgroundImage: "linear-gradient(to right,#D0FADE, rgba(255, 134, 250, 0.2))",
+              overflow: "hidden",
             }}
+            className={"df_size"}
           >
-            {isSubmitting && <LinearProgress className='pg-load' />}
-            <Box sx={{ height: "100%", padding: "10px 20px 0px 20px" }}>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  position: "relative",
+            {release && <ReleaseDoc />}
+            <SideBar handleOpenDrawer={handleOpenDrawer} drawerNew={drawerNew} />
+            {view && (
+              <img
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  right: "20px",
+                  zIndex: "1",
+                  transform: "translateY(-50%)",
                 }}
-              >
-                <IconButton
-                  onClick={toggleDrawer}
-                  sx={{ position: "absolute", left: "0" }}
-                  aria-label='close'
-                  size='medium'
-                >
-                  <KeyboardArrowRight fontSize='large' />
-                </IconButton>
-
-                <img
-                  style={{
-                    width: "70px",
+                src='../../../assets/home-icon.png'
+                alt='homeicon'
+              />
+            )}
+            <Drawer
+              variant='persistent'
+              className='box-container'
+              anchor='right'
+              open={drawerNew}
+              sx={{
+                width: "400px",
+                position: "relative",
+                flexShrink: 0,
+                [`& .MuiDrawer-paper`]: {
+                  width: "400px",
+                  boxSizing: "border-box",
+                  height: "calc(100% - 65px)",
+                },
+              }}
+            >
+              {isSubmitting && <LinearProgress className='pg-load' />}
+              <Box sx={{ height: "100%", padding: "10px 20px 0px 20px" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    position: "relative",
                   }}
-                  src='../../../assets/home-icon.png'
-                  alt='homeicon'
-                />
-                <span
-                  style={{
-                    color: " #6A53CC",
-                    fontSize: "30px",
-                    fontWeight: 800,
-                    marginLeft: "10px",
-                  }}
                 >
-                  New
-                </span>
-              </Box>
-
-              <Box
-                className='box-container'
-                sx={{
-                  height: "calc((100% - 100px)/2)",
-                  overflow: "hidden auto",
-                  padding: "10px",
-                }}
-              >
-                {type === "image" && (
-                  <>
-                    <Button startIcon={<Add />} onClick={handleUpload} variant='outlined'>
-                      Upload Image
-                      <input
-                        style={{ display: "none" }}
-                        id='upload-photo'
-                        name='upload-photo'
-                        type='file'
-                        accept='image/*'
-                        onChange={(e) => {
-                          setFiles(e.target.files);
-                        }}
-                        ref={fileImg}
-                      />
-                    </Button>
-                    <div id='wrap-img'>
-                      <ThemeProvider theme={theme}>
-                        <Stack
-                          sx={{
-                            display: `${files.length === 0 ? "none" : "block"}`,
-                          }}
-                          id='img-stack'
-                          direction='row'
-                          spacing={2}
-                        >
-                          <IconButton size='large' color='nearWhite' aria-label='view'>
-                            <RemoveRedEye />
-                          </IconButton>
-                          <IconButton size='large' color='nearWhite' aria-label='delete'>
-                            <Delete />
-                          </IconButton>
-                        </Stack>
-                      </ThemeProvider>
-                      <img
-                        ref={imgRef}
-                        id='img-upload'
-                        style={{
-                          display: `${files.length === 0 ? "none" : "block"}`,
-                          width: "100%",
-                          margin: "5px 0px",
-                        }}
-                        alt='note-img'
-                      />
-                    </div>
-                  </>
-                )}
-                <Box sx={{ position: "relative" }}>
-                  <span
-                    onClick={() => {
-                      setPinned(!pinned);
-                    }}
+                  <IconButton
+                    onClick={toggleDrawer}
+                    sx={{ position: "absolute", left: "0" }}
+                    aria-label='close'
+                    size='medium'
+                  >
+                    <KeyboardArrowRight fontSize='large' />
+                  </IconButton>
+                  <img
                     style={{
-                      cursor: "pointer",
-                      position: "absolute",
-                      top: "-10px",
-                      left: "-8px",
+                      width: "70px",
+                    }}
+                    src='../../../assets/home-icon.png'
+                    alt='homeicon'
+                  />
+                  <span
+                    style={{
+                      color: " #6A53CC",
+                      fontSize: "30px",
+                      fontWeight: 800,
+                      marginLeft: "10px",
                     }}
                   >
-                    <PinnedIcon active={pinned} />
+                    New
                   </span>
-                  {type === "text" && (
-                    <TextFieldBox
-                      isSubmitting={isSubmitting}
-                      handleNoteForm={handleNoteForm}
-                      bg={colorNote}
-                      action='Create'
-                    />
-                  )}
+                </Box>
+                <Box
+                  className='box-container'
+                  sx={{
+                    height: "calc((100% - 100px)/2)",
+                    overflow: "hidden auto",
+                    padding: "10px",
+                  }}
+                >
                   {type === "image" && (
-                    <TextFieldBox
-                      isSubmitting={isSubmitting}
-                      handleNoteForm={handleNoteForm}
-                      bg={colorNote}
-                      action='Create'
-                    />
+                    <>
+                      <Button startIcon={<Add />} onClick={handleUpload} variant='outlined'>
+                        Upload Image
+                        <input
+                          style={{ display: "none" }}
+                          id='upload-photo'
+                          name='upload-photo'
+                          type='file'
+                          accept='image/*'
+                          onChange={(e) => {
+                            setFiles(e.target.files);
+                          }}
+                          ref={fileImg}
+                        />
+                      </Button>
+                      <div id='wrap-img'>
+                        <ThemeProvider theme={theme}>
+                          <Stack
+                            sx={{
+                              display: `${files.length === 0 ? "none" : "block"}`,
+                            }}
+                            id='img-stack'
+                            direction='row'
+                            spacing={2}
+                          >
+                            <IconButton size='large' color='nearWhite' aria-label='view'>
+                              <RemoveRedEye />
+                            </IconButton>
+                            <IconButton size='large' color='nearWhite' aria-label='delete'>
+                              <Delete />
+                            </IconButton>
+                          </Stack>
+                        </ThemeProvider>
+                        <img
+                          ref={imgRef}
+                          id='img-upload'
+                          style={{
+                            display: `${files.length === 0 ? "none" : "block"}`,
+                            width: "100%",
+                            margin: "5px 0px",
+                          }}
+                          alt='note-img'
+                        />
+                      </div>
+                    </>
                   )}
-                  {type === "checklist" && (
-                    <CheckListBox
-                      isSubmitting={isSubmitting}
-                      handleNoteForm={handleNoteForm}
-                      bg={colorNote}
-                      action='Create'
-                    />
-                  )}
+                  <Box sx={{ position: "relative" }}>
+                    <span
+                      onClick={() => {
+                        setPinned(!pinned);
+                      }}
+                      style={{
+                        cursor: "pointer",
+                        position: "absolute",
+                        top: "-10px",
+                        left: "-8px",
+                      }}
+                    >
+                      <PinnedIcon active={pinned} />
+                    </span>
+                    {type === "text" && (
+                      <TextFieldBox
+                        isSubmitting={isSubmitting}
+                        handleNoteForm={handleNoteForm}
+                        bg={colorNote}
+                        action='Create'
+                      />
+                    )}
+                    {type === "image" && (
+                      <TextFieldBox
+                        isSubmitting={isSubmitting}
+                        handleNoteForm={handleNoteForm}
+                        bg={colorNote}
+                        action='Create'
+                      />
+                    )}
+                    {type === "checklist" && (
+                      <CheckListBox
+                        isSubmitting={isSubmitting}
+                        handleNoteForm={handleNoteForm}
+                        bg={colorNote}
+                        action='Create'
+                      />
+                    )}
+                  </Box>
+                </Box>
+                <Box style={{ height: "calc((100% - 50px)/2)", marginTop: "5px" }}>
+                  <ToolsNote
+                    options={options}
+                    handleChangeNote={handleChangeNote}
+                    handleOptionsNote={handleOptionsNote}
+                    handleNoteForm={handleNoteForm}
+                  />
                 </Box>
               </Box>
-              <Box style={{ height: "calc((100% - 50px)/2)", marginTop: "5px" }}>
-                <ToolsNote
-                  options={options}
-                  handleChangeNote={handleChangeNote}
-                  handleOptionsNote={handleOptionsNote}
-                  handleNoteForm={handleNoteForm}
-                />
-              </Box>
-            </Box>
-          </Drawer>
-          <Routes>
-            <Route path='/' element={<Navigate to={`/home/${df_nav.toLowerCase()}`} />} />
-            <Route
-              path='/explore'
-              element={
-                <Explore
-                  setArchivedData={handleEdit}
-                  handleDelNote={handleDelNote}
-                  toolsNote={{
-                    options: options,
-                    handleChangeNote: handleChangeNote,
-                    handleOptionsNote: handleOptionsNote,
-                  }}
-                />
-              }
-            />
-            <Route path='/calendar' element={<CalendarTable data={data} />} />
-            <Route
-              path='/archived'
-              element={
-                <Archived
-                  data={data}
-                  setArchivedData={handleEdit}
-                  handleDelNote={handleDelNote}
-                  toolsNote={{
-                    options: options,
-                    handleChangeNote: handleChangeNote,
-                    handleOptionsNote: handleOptionsNote,
-                  }}
-                />
-              }
-            />
-            <Route
-              path='/screenshot'
-              element={
-                <Screenshot
-                  data={data}
-                  setArchivedData={handleEdit}
-                  handleDelNote={handleDelNote}
-                />
-              }
-            />
-            <Route
-              path='/deleted'
-              element={
-                <Deleted
-                  data={dataTrash}
-                  handleInTrash={handleInTrash}
-                  setTrashData={handleEditTrash}
-                />
-              }
-            />
-            <Route
-              path='/settings'
-              element={
-                <Setting setDf_nav={setDf_nav} setColorNote={setColorNote} setUser={setUser} />
-              }
-            />
-            <Route path='/groups' element={<Groups />} />
-          </Routes>
-          <Footer />
-        </div>
-      )}
-    </div>
+            </Drawer>
+            <Routes>
+              <Route path='/' element={<Navigate to={`/home/${df_nav.toLowerCase()}`} />} />
+              <Route
+                path='/explore'
+                element={
+                  <Explore
+                    setArchivedData={handleEdit}
+                    handleDelNote={handleDelNote}
+                    toolsNote={{
+                      options: options,
+                      handleChangeNote: handleChangeNote,
+                      handleOptionsNote: handleOptionsNote,
+                    }}
+                  />
+                }
+              />
+              <Route path='/calendar' element={<CalendarTable data={data} />} />
+              <Route
+                path='/archived'
+                element={
+                  <Archived
+                    data={data}
+                    setArchivedData={handleEdit}
+                    handleDelNote={handleDelNote}
+                    toolsNote={{
+                      options: options,
+                      handleChangeNote: handleChangeNote,
+                      handleOptionsNote: handleOptionsNote,
+                    }}
+                  />
+                }
+              />
+              <Route
+                path='/screenshot'
+                element={
+                  <Screenshot
+                    data={data}
+                    setArchivedData={handleEdit}
+                    handleDelNote={handleDelNote}
+                  />
+                }
+              />
+              <Route
+                path='/deleted'
+                element={
+                  <Deleted
+                    data={dataTrash}
+                    handleInTrash={handleInTrash}
+                    setTrashData={handleEditTrash}
+                  />
+                }
+              />
+              <Route
+                path='/settings'
+                element={
+                  <Setting setDf_nav={setDf_nav} setColorNote={setColorNote} setUser={setUser} />
+                }
+              />
+              <Route path='/groups' element={<Groups />} />
+            </Routes>
+            <Footer />
+          </div>
+        )}
+      </div>
+    </ShareNoteContext.Provider>
   );
 }
 

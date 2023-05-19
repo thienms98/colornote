@@ -2,7 +2,6 @@ import { useState } from "react";
 
 import { uploadFile } from "@uploadcare/upload-client";
 import { fileInfo, UploadcareSimpleAuthSchema } from "@uploadcare/rest-client";
-import { uploadCareUrl } from "../../constants/uploadCare";
 
 // import classNames from 'classnames/bind'
 // import styles from './ImageUploader.module.scss'
