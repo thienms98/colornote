@@ -47,7 +47,7 @@ export default function LandingPage() {
   const [largeNote, setLargeNote] = useState(-1);
 
   useEffect(() => {
-    userApi.getNewUsers().then((res) => setNewUsers(res.data.reverse().slice(0, 5)));
+    userApi.getNewUsers().then((res) => setNewUsers(res.data.slice(0, 5)));
     noteApi.getLastestNotes().then((res) => setNewNotes(res.notes.reverse().slice(0, 5)));
   }, []);
 
@@ -120,13 +120,23 @@ export default function LandingPage() {
               <div className={cx("title", "users")}>New Users</div>
               <div className={cx("items")}>
                 {newUsers.length &&
-                  [...newUsers].slice(-5).map((user) => (
+                  [...newUsers].map((user) => (
                     <div className={cx("item")} key={user.id}>
                       <div className={cx("avatar")}>
                         <img src={user.linkAvatar} alt='' width={24} />
                       </div>
-                      <div className={cx("detail")}>
-                        <div className={cx("name")}>{user.name}</div>
+                      <div className={cx("detail")} style={{ flex: 1, alignItems: "stretch" }}>
+                        <div
+                          className={cx("name")}
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            width: "100%",
+                          }}
+                        >
+                          <span>{user.name}</span>
+                          <div>{diffTime(user.createAt)}</div>
+                        </div>
                         <div className={cx("gmail")}>{user.user_name}</div>
                       </div>
                     </div>
