@@ -1,14 +1,26 @@
-$textColor: #fff;
-$textHoverColor: #8c8f94;
-$bluredLine: rgba(255, 255, 255, 0.1);
+// --textColor: #fff;
+// --textHoverColor: #8c8f94;
+// --bluredLine: rgba(255, 255, 255, 0.1);
 
 .wrapper{
-  background-color: #1f2123;
-  color: $textColor;
+  --textColor: #fff;
+  --textHoverColor: #8c8f94;
+  --bluredLine: rgba(255, 255, 255, 0.1);
+  --bg-main: #1f2123;
+  --btn-bg: #323436;
+  background-color: var(--bg-main);
+  color: var(--textColor);
   font-size: 1rem;
   padding: 0 20%;
   transition: padding .5s;
 }
+.wrapper.light{
+  --textColor: #1f2123;
+  --textHoverColor: rgb(1, 56, 159);
+  --bluredLine: #8c8f94;
+  --bg-main: #fff;
+  --btn-bg: #ccc8;
+  }
 
 .header{
   margin: 0 auto;
@@ -55,19 +67,19 @@ $bluredLine: rgba(255, 255, 255, 0.1);
       line-height: 2;
     }
     .item:hover:not(:last-child){
-      color: $textHoverColor;
+      color: var(--textHoverColor);
     }
     .login{
       padding-left: 1rem;
-      border-left: 1px solid $bluredLine
+      border-left: 1px solid var(--bluredLine)
     } 
     .signup{
       padding: 0 0.75rem;
-      border: 1px solid $bluredLine;
+      border: 1px solid var(--bluredLine);
       border-radius: .25rem;
 
       &:hover{
-        border-color: $textHoverColor;
+        border-color: var(--textHoverColor);
       }
     }
   }
@@ -80,7 +92,7 @@ $bluredLine: rgba(255, 255, 255, 0.1);
 section{
   padding-bottom: 2rem;
   margin-bottom: 5rem;
-  border-bottom: 1px solid $bluredLine;
+  border-bottom: 1px solid var(--bluredLine);
 
   &>.title{
     font-size: 3.5rem;
@@ -110,7 +122,8 @@ section{
       outline: none;
       font-size: 1.25rem;
       padding: 0.625rem 1.125rem;
-      color: $textColor;
+      // color: var(--textColor);
+      color: #fff;
       background-color: #3361cc;
       border-radius: .25rem;
       cursor: pointer;
@@ -132,7 +145,7 @@ section{
         gap: 1rem;
 
         &>.title{
-          border-bottom: 1px solid $bluredLine;
+          border-bottom: 1px solid var(--bluredLine);
           text-align: center;
           padding-bottom: 1rem;
         }
@@ -254,8 +267,9 @@ section{
       grid-template-columns: 40px auto;
       grid-template-areas: 'icon default'
       'icon brand';
-      padding: .5rem 1.25rem  ;
-      background: #323436;
+      padding: .5rem 1.25rem;
+      color: var(--bgma);
+      background: var(--btn-bg);
       border: 1px solid #646970;
 
       &>.icon{
@@ -302,7 +316,7 @@ section{
       white-space: nowrap;
 
       &:hover{
-        color: $textHoverColor
+        color: var(--textHoverColor)
       }
     }
   }
@@ -440,7 +454,7 @@ section{
     background-color: #646970;
   }
   .title{
-    border-bottom: 1px solid $bluredLine;
+    border-bottom: 1px solid var(--bluredLine);
     padding-bottom: 4px;
     font-size: 1.5rem;
     display: flex;
