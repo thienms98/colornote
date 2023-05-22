@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
 // api
@@ -45,7 +45,6 @@ export default function LandingPage() {
   const [menu, setMenu] = useState(false);
   const [newUsers, setNewUsers] = useState([]);
   const [newNotes, setNewNotes] = useState([]);
-  const [currentNote, setCurrentNote] = useState(0);
   const [modal, setModal] = useState(false);
   const [largeNote, setLargeNote] = useState(-1);
   const [theme, setTheme] = useState(true);
@@ -55,13 +54,13 @@ export default function LandingPage() {
     noteApi.getLastestNotes().then((res) => setNewNotes(res.notes.reverse().slice(0, 5)));
   }, []);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setCurrentNote((cr) => (cr + 1 > newNotes.length - 1 ? 0 : cr + 1));
-    }, 3000);
+  // useEffect(() => {
+  //   const timeout = setTimeout(() => {
+  //     setCurrentNote((cr) => (cr + 1 > newNotes.length - 1 ? 0 : cr + 1));
+  //   }, 3000);
 
-    return () => clearTimeout(timeout);
-  }, [currentNote]);
+  //   return () => clearTimeout(timeout);
+  // }, [currentNote]);
 
   const changeTheme = (val) => {
     setTheme(val);
@@ -124,7 +123,7 @@ export default function LandingPage() {
               <Link to='/register'>Sign up now</Link>
             )}
           </button>
-          <div className={cx("lastest")}>
+          {/* <div className={cx("lastest")}>
             <div className={cx("col")}>
               <div className={cx("title", "users")}>New Users</div>
               <div className={cx("items")}>
@@ -188,6 +187,86 @@ export default function LandingPage() {
                   <KeyboardArrowLeftIcon />
                 </div>
               </div>
+            </div>
+          </div> */}
+          <div className={cx("positive-users")}>
+            <div className={cx("sort")}>Member</div>
+            <div className={cx("refresh")}>Refresh</div>
+            <div className={cx("list")}>
+              {[1, 2, 3, 4, 5]
+                .map((item, index) => Math.floor(Math.random() * 750) + 251)
+                .sort((a, b) => b - a)
+                .map((item, index) => {
+                  return (
+                    <div className={cx("list-item")} key={index}>
+                      <div className={cx("index")}>{index}</div>
+                      <div className={cx("name")}>user {index}</div>
+                      <div className={cx("count")}></div> {item} notes
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+          <div className={cx("news-title")}>Lastest Public Notes</div>
+          <div className={cx("lastest-notes")}>
+            <div className={cx("list")}>
+              {newNotes &&
+                [...newNotes].slice(0, 11).map((note, index) => {
+                  return (
+                    <div className={cx("note")} key={index} onClick={() => setLargeNote(index)}>
+                      <div className={cx("index")}>{index}</div>
+                      <div className={cx("type")}>{note.type}</div>
+                      <div className={cx("title")}>{note.title}</div>
+                      <div className={cx("date")}>{diffTime(note.createAt)}</div>
+                      <div className={cx("author")}>{note.idUser}</div>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+          <div className={cx("news-title")}>New Users</div>
+          <div className={cx("new-users")}>
+            <div className={cx("users")}>
+              {newUsers &&
+                [...newUsers].slice(0, 3).map((user, index) => {
+                  return (
+                    <div className={cx("user")} key={index}>
+                      <div className={cx("avatar")}>
+                        <img src='' alt='' width={40} height={40} />
+                        {index}
+                      </div>
+                      <div className={cx("name")}>{user.name}</div>
+                      <div className={cx("date")}>{diffTime(user.createAt)}</div>
+                      <div className={cx("mail")}>{user.user_name}</div>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+          <div className={cx("online-users")}>
+            <div className={cx("title")}>Online</div>
+            <div className={cx("list")}>
+              {[
+                "QTV",
+                "Hao9x",
+                "Thuylinh",
+                "Cubucucbu",
+                "Thien",
+                "Kazuha",
+                "Ronaldo",
+                "Succubus",
+              ].map((user) => {
+                return (
+                  <div className={cx("list-item")}>
+                    <div className={cx("avatar")}>
+                      <img src='' alt='' width={40} height={40} />
+                    </div>
+                    <div className={cx("name")}>{user}</div>
+                    <div className={cx("time")}>Online</div>
+                    <div className={cx("status", "active")}></div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -368,16 +447,27 @@ export default function LandingPage() {
 
 function Note({ note, active, index, large = false, clearLarge }) {
   const { r, g, b, a } = note.color;
+  const containerRef = useRef(null);
 
   return (
     <div
-      className={cx("note", { large: large })}
+      className={cx("large-note", { large: large })}
       style={{
         backgroundColor: `rgba(${r},${g},${b},${a})`,
         "--index": index,
       }}
+      ref={containerRef}
     >
-      {large && <div className={cx("overlay")} onClick={clearLarge}></div>}
+      {large && (
+        <div
+          className={cx("overlay")}
+          onClick={(e) => {
+            console.log(e.target);
+            console.log(containerRef.current);
+            if (!e.target.contains(containerRef.current)) clearLarge();
+          }}
+        ></div>
+      )}
       <div className={cx("title")}>
         {note.title}
         <span>{diffTime(note.createAt)}</span>

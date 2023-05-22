@@ -20,8 +20,8 @@ import Groups from "../../features/Groups";
 import "./home.css";
 import { ThemeProvider } from "@emotion/react";
 import axios from "axios";
-import { refresh } from "../../features/Auth/userSlice";
-import { useJwt } from "react-jwt";
+// import { refresh } from "../../features/Auth/userSlice";
+// import { useJwt } from "react-jwt";
 import Screenshot from "../../features/Screenshot";
 import { io } from "socket.io-client";
 import { socketActions } from "../socketSlice";
@@ -39,6 +39,7 @@ export const ShareNoteContext = createContext(null);
 
 function Home(props) {
   const { enqueueSnackbar } = useSnackbar();
+  const dispatch = useDispatch();
 
   const [user, setUser] = useState(
     useSelector((state) => state.user.current) || JSON.parse(localStorage.getItem("user"))
@@ -67,23 +68,23 @@ function Home(props) {
   });
 
   const [pinned, setPinned] = useState(false);
-  const { refreshToken } = useJwt({
-    token: user?.jwt || JSON.parse(localStorage.getItem("access_token")),
-  });
-  // Tự động refresh token sau 30 phút
-  const dispatch = useDispatch();
-  useEffect(() => {
-    const intervalId = setInterval(async () => {
-      const token = await dispatch(refresh());
-      console.log(token);
-      if (token) {
-        // Nếu nhận được token mới, cập nhật lại giá trị trong state hoặc local storage
-        localStorage.setItem("access_token", JSON.stringify(token));
-      }
-    }, 30 * 60 * 1000);
+  // const { refreshToken } = useJwt({
+  //   token: user?.jwt || JSON.parse(localStorage.getItem("access_token")),
+  // });
+  // // Tự động refresh token sau 30 phút
+  // const dispatch = useDispatch();
+  // useEffect(() => {
+  //   const intervalId = setInterval(async () => {
+  //     const token = await dispatch(refresh());
+  //     console.log(token);
+  //     if (token) {
+  //       // Nếu nhận được token mới, cập nhật lại giá trị trong state hoặc local storage
+  //       localStorage.setItem("access_token", JSON.stringify(token));
+  //     }
+  //   }, 30 * 60 * 1000);
 
-    return () => clearInterval(intervalId);
-  }, [dispatch, refreshToken]);
+  //   return () => clearInterval(intervalId);
+  // }, [dispatch, refreshToken]);
   const toggleDrawer = () => {
     setDrawerNew(false);
   };
