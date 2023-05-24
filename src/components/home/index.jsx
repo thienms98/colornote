@@ -4,25 +4,22 @@ import dayjs from "dayjs";
 import { useSnackbar } from "notistack";
 import React, { useEffect, useRef, useState, createContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import noteApi from "../../api/noteApi";
 import { STATIC_HOST, checkJWT } from "../../constants";
-import { Archived, CalendarTable, Deleted, Setting, Explore } from "../../features";
 import PinnedIcon from "../CustomIcons/PinnedIcon";
-import CheckListBox from "../FieldNote/CheckListFieldBox";
-import TextFieldBox from "../FieldNote/TextFieldBox";
+import { TextFieldBox, CheckListBox, ScanFieldBox } from "../FieldNote";
 import SharePopup from "../SharePopup";
 import Footer from "../Footer";
 import ReleaseDoc from "../ReleaseDoc";
 import SideBar from "../SideBar";
 import ToolsNote from "../ToolsNote";
-import Groups from "../../features/Groups";
+import HomeRouting from "../HomeRouting";
 import "./home.css";
 import { ThemeProvider } from "@emotion/react";
 import axios from "axios";
 // import { refresh } from "../../features/Auth/userSlice";
 // import { useJwt } from "react-jwt";
-import Screenshot from "../../features/Screenshot";
 import { io } from "socket.io-client";
 import { socketActions } from "../socketSlice";
 Home.propTypes = {};
@@ -168,7 +165,7 @@ function Home(props) {
       ...value,
       ...configOptions,
       pinned: pinned,
-      type: type,
+      type: type === "scan" ? "image" : type,
     };
 
     try {
@@ -252,6 +249,7 @@ function Home(props) {
     pathname.split("/")[2] === "calendar" ||
     pathname.split("/")[2] === "groups"
   );
+
   return (
     <ShareNoteContext.Provider value={(id) => setSharedNoteId(id)}>
       <div>
@@ -426,6 +424,14 @@ function Home(props) {
                         action='Create'
                       />
                     )}
+                    {type === "scan" && (
+                      <ScanFieldBox
+                        isSubmitting={isSubmitting}
+                        handleNoteForm={handleNoteForm}
+                        bg={colorNote}
+                        action='Create'
+                      />
+                    )}
                   </Box>
                 </Box>
                 <Box style={{ height: "calc((100% - 50px)/2)", marginTop: "5px" }}>
@@ -438,66 +444,24 @@ function Home(props) {
                 </Box>
               </Box>
             </Drawer>
-            <Routes>
-              <Route path='/' element={<Navigate to={`/home/${df_nav.toLowerCase()}`} />} />
-              <Route
-                path='/explore'
-                element={
-                  <Explore
-                    setArchivedData={handleEdit}
-                    handleDelNote={handleDelNote}
-                    toolsNote={{
-                      options: options,
-                      handleChangeNote: handleChangeNote,
-                      handleOptionsNote: handleOptionsNote,
-                    }}
-                  />
-                }
+            {data && (
+              <HomeRouting
+                data={data}
+                df_nav={df_nav}
+                setDf_nav={setDf_nav}
+                dataTrash={dataTrash}
+                setColorNote={setColorNote}
+                setUser={setUser}
+                options={options}
+                handleEdit={handleEdit}
+                handleChangeNote={handleChangeNote}
+                handleDelNote={handleDelNote}
+                handleEditTrash={handleEditTrash}
+                handleInTrash={handleInTrash}
+                handleOptionsNote={handleOptionsNote}
               />
-              <Route path='/calendar' element={<CalendarTable data={data} />} />
-              <Route
-                path='/archived'
-                element={
-                  <Archived
-                    data={data}
-                    setArchivedData={handleEdit}
-                    handleDelNote={handleDelNote}
-                    toolsNote={{
-                      options: options,
-                      handleChangeNote: handleChangeNote,
-                      handleOptionsNote: handleOptionsNote,
-                    }}
-                  />
-                }
-              />
-              <Route
-                path='/screenshot'
-                element={
-                  <Screenshot
-                    data={data}
-                    setArchivedData={handleEdit}
-                    handleDelNote={handleDelNote}
-                  />
-                }
-              />
-              <Route
-                path='/deleted'
-                element={
-                  <Deleted
-                    data={dataTrash}
-                    handleInTrash={handleInTrash}
-                    setTrashData={handleEditTrash}
-                  />
-                }
-              />
-              <Route
-                path='/settings'
-                element={
-                  <Setting setDf_nav={setDf_nav} setColorNote={setColorNote} setUser={setUser} />
-                }
-              />
-              <Route path='/groups' element={<Groups />} />
-            </Routes>
+            )}
+
             <Footer />
           </div>
         )}

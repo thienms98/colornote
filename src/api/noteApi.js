@@ -2,7 +2,6 @@ import axiosClient from "./axiosClient";
 
 const noteApi = {
   createNote(idUser, data) {
-    console.log("create note with data: ", data);
     const url = `/notes/${idUser}`;
     return axiosClient.post(url, data);
   },

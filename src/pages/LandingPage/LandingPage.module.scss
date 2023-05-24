@@ -273,22 +273,11 @@ section{
         background-color: var(--bg-main);
       }
       &>.list>.note{
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: 40px 100px 2fr 1fr 1fr;
         gap: 12px;
         border-bottom: 1px dotted;
         padding-right: 10px;
-
-        .type{
-          flex-basis: 100px;
-        }
-        .title{
-          flex: 1;
-        }
-        .date{
-          flex-basis: 140px;
-        }
       }
     }
     .new-users{

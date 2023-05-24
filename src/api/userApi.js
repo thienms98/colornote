@@ -21,8 +21,8 @@ const userApi = {
     return axiosClient.post(url, data);
   },
   getAll(id) {
-    const url = '/allUsers/' + id
-    return axiosClient.get(url)
+    const url = "/allUsers/" + id;
+    return axiosClient.get(url);
   },
   lock2(id, data) {
     const url = "/create-pass-2/" + id;
@@ -34,6 +34,10 @@ const userApi = {
   },
   getNewUsers() {
     const url = "/lastUser";
+    return axiosClient.get(url);
+  },
+  profile(id) {
+    const url = "/profile/" + id;
     return axiosClient.get(url);
   },
 };

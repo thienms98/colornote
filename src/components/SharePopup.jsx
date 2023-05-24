@@ -94,7 +94,6 @@ const SharePopup = ({ noteId }) => {
       }
     });
   }, []);
-  console.log(id);
 
   return (
     noteId && (

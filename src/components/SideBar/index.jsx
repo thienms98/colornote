@@ -11,6 +11,7 @@ import {
   Visibility,
   VisibilityOff,
   GridView,
+  DocumentScannerOutlined,
 } from "@mui/icons-material";
 import {
   Button,
@@ -51,18 +52,12 @@ function SideBar({ handleOpenDrawer, drawerNew }) {
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
-  const handleCheckList = () => {
+
+  const handleCreate = (type) => {
     handleClose();
-    handleOpenDrawer("checklist");
+    handleOpenDrawer(type);
   };
-  const handleText = () => {
-    handleClose();
-    handleOpenDrawer("text");
-  };
-  const handleImage = () => {
-    handleClose();
-    handleOpenDrawer("image");
-  };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -91,43 +86,16 @@ function SideBar({ handleOpenDrawer, drawerNew }) {
       enqueueSnackbar("Password 2 not true", { variant: "error" });
     }
   };
+  const dark = { color: "#44546F" };
   const icons = [
-    <GridView
-      style={{
-        color: "#44546F",
-      }}
-    />,
-    <CalendarMonth
-      style={{
-        color: "#44546F",
-      }}
-    />,
-    <Inventory2Outlined
-      style={{
-        color: "#44546F",
-      }}
-    />,
-    <Screenshot
-      style={{
-        color: "#44546F",
-      }}
-    />,
-    <DeleteOutline
-      style={{
-        color: "#44546F",
-      }}
-    />,
+    <GridView style={dark} />,
+    <CalendarMonth style={dark} />,
+    <Inventory2Outlined style={dark} />,
+    <Screenshot style={dark} />,
+    <DeleteOutline style={dark} />,
 
-    <SettingsOutlined
-      style={{
-        color: "#44546F",
-      }}
-    />,
-    <PeopleOutline
-      style={{
-        color: "#44546F",
-      }}
-    />,
+    <SettingsOutlined style={dark} />,
+    <PeopleOutline style={dark} />,
   ];
   const handleNav = (nav) => {
     if (pathname.split("/")[2] === nav) return;
@@ -208,23 +176,29 @@ function SideBar({ handleOpenDrawer, drawerNew }) {
             "aria-labelledby": "basic-button",
           }}
         >
-          <MenuItem onClick={handleText}>
+          <MenuItem onClick={() => handleCreate("text")}>
             <ListItemIcon>
               <TextSnippetOutlined fontSize='small' />
             </ListItemIcon>
             Text
           </MenuItem>
-          <MenuItem onClick={handleCheckList}>
+          <MenuItem onClick={() => handleCreate("checklist")}>
             <ListItemIcon>
               <ListAltOutlined fontSize='small' />
             </ListItemIcon>
             Check list
           </MenuItem>
-          <MenuItem onClick={handleImage}>
+          <MenuItem onClick={() => handleCreate("image")}>
             <ListItemIcon>
               <AddPhotoAlternateOutlined fontSize='small' />
             </ListItemIcon>
             Image
+          </MenuItem>
+          <MenuItem onClick={() => handleCreate("scan")}>
+            <ListItemIcon>
+              <DocumentScannerOutlined fontSize='small' />
+            </ListItemIcon>
+            Scan text
           </MenuItem>
         </Menu>
       </div>

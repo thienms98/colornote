@@ -32,6 +32,7 @@ function ImageFieldBox({ bg, handleNoteForm, isSubmitting, cx = "", src = "", tt
 
   const cxDebounce = useDebounce(content, 500) || cx;
   const ttDebounce = useDebounce(title, 500) || tt;
+
   const handleSubmit = () => {
     if (ttDebounce.trim() === "" || cxDebounce.trim() === "") {
       enqueueSnackbar("Please fill in note!", { variant: "error" });

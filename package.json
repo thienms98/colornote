@@ -33,6 +33,7 @@
     "socket.io": "^4.6.1",
     "socket.io-client": "^4.6.1",
     "swiper": "^9.3.1",
+    "tesseract.js": "^2.1.1",
     "web-vitals": "^2.1.4",
     "yup": "^1.0.2"
   },
