@@ -9,12 +9,12 @@ const noteApi = {
     const url = `/notes/${idUser}`;
     return axiosClient.get(url);
   },
-  getNoteById(idNote) {
-    const url = `/notes/${idNote}`;
-    return axiosClient.get();
-  },
   getLastestNotes() {
     const url = "/notes_public";
+    return axiosClient.get(url);
+  },
+  getPublicNote(id) {
+    const url = "/note-share/" + id;
     return axiosClient.get(url);
   },
   delTruncNote(idNote) {

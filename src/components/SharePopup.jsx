@@ -77,9 +77,10 @@ const SharePopup = ({ noteId }) => {
     inputRef.current.setSelectionRange(0, 99999); // For mobile devices
 
     // Copy the text inside the text field
-    navigator.clipboard.writeText(inputRef.current.value);
+    navigator.clipboard.writeText(inputRef.current.value).then(() => {
+      enqueueSnackbar("Copied to Clipboard", { variant: "success" });
+    });
 
-    enqueueSnackbar("Copied to Clipboard", { variant: "success" });
     shareNoteId(null);
   };
 

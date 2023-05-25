@@ -1,8 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
+import useDebounce from "../../customHook/useDebounce";
 
 import axios from "axios";
 import noteApi from "../../api/noteApi";
+
+import Tesseract from "tesseract.js";
+import { convertColor } from "../../constants";
 
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
@@ -11,23 +15,28 @@ import PublicIcon from "@mui/icons-material/Public";
 import LockIcon from "@mui/icons-material/Lock";
 import PersonIcon from "@mui/icons-material/Person";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import {
+  FormControl,
+  FormControlLabel,
+  InputLabel,
+  Select,
+  MenuItem,
+  Box,
+  Button,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  IconButton,
+  InputAdornment,
+  Input,
+} from "@mui/material";
 
 import dayjs from "dayjs";
 import { colorBucket } from "../../constants/color_bucket";
 import { useSnackbar } from "notistack";
 import { DateTimePicker } from "@mui/x-date-pickers";
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  FormControl,
-  InputLabel,
-  IconButton,
-  InputAdornment,
-  Button,
-  Input,
-} from "@mui/material";
 
 import classNames from "classnames/bind";
 import styles from "./GuestCreateForm.module.scss";
@@ -141,7 +150,7 @@ export default function GuestCreateForm({ clear }) {
         </div>
         <div className={cx("type-items")}>
           {showTypes &&
-            ["Text", "Checklist", "Image"].map((item, index) => (
+            ["Text", "Checklist", "Image", "Scan"].map((item, index) => (
               <div
                 className={cx("item", { chosen: type === item.toLowerCase() })}
                 key={index}
@@ -187,6 +196,7 @@ export default function GuestCreateForm({ clear }) {
             <Checklist updateData={(checklist) => setData(checklist)} />
           </div>
         )}
+        {type === "scan" && <Scan content={data} setContent={setData} setUrl={setMetaData} />}
       </div>
       <button tabIndex={3} onClick={createNote}>
         Create
@@ -367,5 +377,156 @@ function Checklist({ updateData }) {
         + Add task
       </div>
     </div>
+  );
+}
+
+function Scan({ content, setContent, setUrl }) {
+  // scan control
+  const [scanBy, setScanBy] = useState("file");
+  const [scanLanguage, setScanLanguage] = useState("vie");
+  const [fileUrl, setFileUrl] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const fileUrlDebounce = useDebounce(fileUrl, 500) || null;
+  const { enqueueSnackbar } = useSnackbar();
+
+  const imgRef = useRef(null);
+  const handleChangeContent = (e) => {
+    const val = e.target.value;
+    setContent(val);
+  };
+  useEffect(() => {
+    if (!fileUrlDebounce) return;
+    setIsLoading(true);
+
+    Tesseract.recognize(`${fileUrlDebounce}`, scanLanguage)
+      .then((res) => {
+        const {
+          data: { text },
+        } = res;
+        setContent(text);
+        setIsLoading(false);
+      })
+      .catch((err) => enqueueSnackbar(err.message));
+  }, [fileUrlDebounce, scanLanguage]);
+
+  return (
+    <Box
+      sx={{
+        padding: "7px",
+        borderRadius: "5px",
+        boxShadow:
+          " 0px 0px 1px rgba(3, 4, 4, 0.5), 0px 8px 12px rgba(3, 4, 4, 0.36), inset 0px 0px 0px 1px rgba(188, 214, 240, 0.04)",
+        marginTop: "10px",
+      }}
+    >
+      <Box>
+        <Box sx={{ display: "flex", flexDirection: "row" }}>
+          <FormControl>
+            <InputLabel id='demo-simple-select-label'>File type</InputLabel>
+            <Select
+              labelId='demo-simple-select-label'
+              id='demo-simple-select'
+              value={scanBy}
+              label='Scan with'
+              onChange={(e) => {
+                setScanBy(e.target.value);
+              }}
+            >
+              <MenuItem value={"file"}>Image file</MenuItem>
+              <MenuItem value={"url"}>Image url</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl>
+            <InputLabel id='demo-simple-select-label'>Language</InputLabel>
+            <Select
+              labelId='demo-simple-select-label'
+              id='demo-simple-select'
+              value={scanLanguage}
+              label='Scan with'
+              onChange={(e) => {
+                setScanLanguage(e.target.value);
+              }}
+            >
+              <MenuItem value={"vie"}>Vietnamese</MenuItem>
+              <MenuItem value={"eng"}>English</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+        {scanBy === "file" ? (
+          <Button
+            // startIcon={<Add />}
+            // onClick={handleUpload}
+            variant='outlined'
+            sx={{ marginTop: "20px" }}
+          >
+            <label htmlFor='upload-photo'>Select Image</label>
+            <input
+              style={{ display: "none" }}
+              id='upload-photo'
+              name='upload-photo'
+              type='file'
+              accept='image/*'
+              onChange={async (e) => {
+                const file = e.target.files[0];
+                setFileUrl(URL.createObjectURL(file));
+                const imgbb = await axios.post(
+                  "https://api.imgbb.com/1/upload?key=a07b4b5e0548a50248aecfb194645bac"
+                );
+                const url = imgbb?.data.data.url || null;
+                setUrl(url);
+              }}
+              ref={imgRef}
+            />
+          </Button>
+        ) : (
+          <TextField
+            id='content-textarea'
+            fullWidth
+            label=''
+            value={fileUrl}
+            onChange={(e) => {
+              setFileUrl(e.target.value);
+              setUrl(e.target.value);
+            }}
+            placeholder='Paste Your Image Url Here!'
+            multiline
+            variant='standard'
+            spellCheck='off'
+            sx={{
+              paddingTop: "20px",
+              overflowY: "scroll",
+              "&>textarea": {
+                height: "100%",
+              },
+            }}
+          />
+        )}
+      </Box>
+      {isLoading ? (
+        "loading..."
+      ) : (
+        <Box className='note-content'>
+          <TextField
+            id='content-textarea'
+            fullWidth
+            label=''
+            value={content}
+            onChange={handleChangeContent}
+            placeholder={"Your note will come here! Don't change it"}
+            multiline
+            variant='standard'
+            spellCheck='off'
+            sx={{
+              paddingTop: "20px",
+              minHeight: "80vh",
+              overflowY: "scroll",
+              "&>textarea": {
+                height: "100%",
+              },
+            }}
+          />
+        </Box>
+      )}
+    </Box>
   );
 }

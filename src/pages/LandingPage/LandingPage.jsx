@@ -21,6 +21,7 @@ import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 
 import { FormGroup, FormControlLabel, Switch } from "@mui/material";
 import styled from "@emotion/styled";
+import Footer from "../../components/Footer";
 
 //styles
 import classNames from "classnames/bind";
@@ -50,7 +51,7 @@ export default function LandingPage() {
   const [theme, setTheme] = useState(true);
 
   useEffect(() => {
-    userApi.getNewUsers().then((res) => setNewUsers(res.data.slice(-5)));
+    userApi.getNewUsers().then((res) => setNewUsers(res.data.slice(0, 5)));
 
     noteApi
       .getLastestNotes()
@@ -166,11 +167,18 @@ export default function LandingPage() {
           <div className={cx("new-users")}>
             <div className={cx("users")}>
               {newUsers &&
-                [...newUsers].slice(0, 3).map((user, index) => {
+                [...newUsers].map((user, index) => {
                   return (
-                    <div className={cx("user")} key={index}>
-                      <div className={cx("avatar")}>
-                        <img src='' alt='' width={40} height={40} />
+                    <div
+                      className={cx("user")}
+                      key={index}
+                      style={{ marginBottom: "8px", display: "flex", alignItems: "center" }}
+                    >
+                      <div
+                        className={cx("avatar")}
+                        style={{ display: "flex", alignItems: "center" }}
+                      >
+                        <img src={user.linkAvatar} alt='' width={40} height={40} />
                         {index}
                       </div>
                       <div className={cx("name")}>{user.name}</div>

@@ -7,6 +7,8 @@ import Register from "./features/Auth/Register";
 import ImageUploader from "./components/ImageUploader/ImageUploader";
 import { checkJWT } from "./constants";
 import GroupDetail from "./components/GroupDetail";
+import { Explore } from "./features";
+import Note from "./components/Note";
 
 function App() {
   if (localStorage.getItem("show") !== "false") {
@@ -26,9 +28,11 @@ function App() {
           path='/register'
           element={checkJWT() ? <Register /> : <Navigate to='/home' replace />}
         />
+        <Route exact path='/explore' element={<Explore />} />
         <Route path='/home/*' element={<Home />} />
         <Route path='/upload' element={<ImageUploader />} />
         <Route path='/group/:idGroup/*' element={<GroupDetail />} />
+        <Route path='/note/:noteId' element={<Note />} />
       </Routes>
     </div>
   );

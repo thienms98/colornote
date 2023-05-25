@@ -30,20 +30,6 @@ export default function HomeRouting(props) {
   return (
     <Routes>
       <Route path='/' element={<Navigate to={`/home/${df_nav.toLowerCase()}`} />} />
-      <Route
-        path='/explore'
-        element={
-          <Explore
-            setArchivedData={handleEdit}
-            handleDelNote={handleDelNote}
-            toolsNote={{
-              options: options,
-              handleChangeNote: handleChangeNote,
-              handleOptionsNote: handleOptionsNote,
-            }}
-          />
-        }
-      />
       <Route path='/calendar' element={<CalendarTable data={data} />} />
       <Route
         path='/archived'

@@ -17,7 +17,7 @@ export default function Explore({ handleDelNote, setArchivedData, toolsNote }) {
         data={notes}
         setArchivedData={setArchivedData}
         handleDelNote={handleDelNote}
-        toolsNote={toolsNote}
+        toolsNote={{ options: { type: "View" } }}
       />
     )
   );
