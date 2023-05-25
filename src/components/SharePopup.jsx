@@ -86,7 +86,7 @@ const SharePopup = ({ noteId }) => {
 
   useEffect(() => {
     setId(noteId);
-    setText(`http://14.225.7.179:18011/note-share/${noteId}`);
+    setText(`http://samnotes.online/note/${noteId}`);
   }, [noteId]);
   useEffect(() => {
     document.body.addEventListener("click", (e) => {

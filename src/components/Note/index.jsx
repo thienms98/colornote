@@ -58,8 +58,8 @@ const Note = () => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: "50%",
-            height: "50%",
+            width: "80%",
+            height: "70%",
             backgroundColor: convertColor(data.color),
             padding: "12px",
             overflowY: "auto",
@@ -89,7 +89,7 @@ const Note = () => {
           )}
           {data.type === "image" && (
             <Box>
-              <img src={data.metadata} alt='' />
+              <img src={data.metaData} alt='' style={{ width: "100%", objectFit: "contain" }} />
             </Box>
           )}
 
